@@ -90,12 +90,11 @@ JVM 这部分内容主要参考 [JVM 虚拟机规范-Java8 ](https://docs.oracle
 - [Java 10 新特性概览](./docs/java/new-features/java10.md)
 - [Java 11 新特性概览](./docs/java/new-features/java11.md)
 - [Java 12~13 新特性概览](./docs/java/new-features/java12-13.md)
-- [Java 14~15 新特性概览](./docs/java/new-features/java14-15.md)
+- [Java 14 新特性概览](./docs/java/new-features/java14.md)
+- [Java 15 新特性概览](./docs/java/new-features/java15.md)
 - [Java 16 新特性概览](./docs/java/new-features/java16.md)
 - [Java 18 新特性概览](./docs/java/new-features/java18.md)
 - [Java 19 新特性概览](./docs/java/new-features/java19.md)
-
-![JavaGuide 官方公众号](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/gongzhonghaoxuanchuan.png)
 
 ## 计算机基础
 
@@ -310,8 +309,6 @@ JVM 这部分内容主要参考 [JVM 虚拟机规范-Java8 ](https://docs.oracle
 - [ZooKeeper 相关概念总结(入门)](./docs/distributed-system/distributed-process-coordination/zookeeper/zookeeper-intro.md)
 - [ZooKeeper 相关概念总结(进阶)](./docs/distributed-system/distributed-process-coordination/zookeeper/zookeeper-plus.md)
 - [ZooKeeper 实战](./docs/distributed-system/distributed-process-coordination/zookeeper/zookeeper-in-action.md)
-
-![JavaGuide 官方公众号](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/gongzhonghaoxuanchuan.png)
 
 ## 高性能
 
