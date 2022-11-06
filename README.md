@@ -159,6 +159,10 @@ JVM 这部分内容主要参考 [JVM 虚拟机规范-Java8 ](https://docs.oracle
 - [字符集详解](./docs/database/character-set.md)
 
 ### MySQL
+**基础总结：**
+
+- [mysql函数使用大全](./docs/database/mysql/sql-function-collection.MD)
+
 
 **知识点/面试题总结：**
 
