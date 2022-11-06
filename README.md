@@ -52,7 +52,7 @@
 * [IO 设计模式总结](./docs/java/io/io-design-patterns.md)
 * [IO 模型详解](./docs/java/io/io-model.md)
 
-### 并发
+### 多线程
 
 **知识点/面试题总结** : (必看 :+1:)
 
@@ -151,16 +151,21 @@ JVM 这部分内容主要参考 [JVM 虚拟机规范-Java8 ](https://docs.oracle
 
 另外，[GeeksforGeeks]( https://www.geeksforgeeks.org/fundamentals-of-algorithms/) 这个网站总结了常见的算法 ，比较全面系统。
 
-## 数据库
+## MiddleWare
+### spring
+### springMVC
+### springcloud
+
+## Database
 
 ### 基础
 
 - [数据库基础知识总结](./docs/database/basis.md)
 - [字符集详解](./docs/database/character-set.md)
 
-### MySQL
-**基础总结：**
+### mysql
 
+**mysql基础：**
 - [mysql函数使用大全](./docs/database/mysql/sql-function-collection.MD)
 
 
@@ -195,11 +200,15 @@ JVM 这部分内容主要参考 [JVM 虚拟机规范-Java8 ](https://docs.oracle
 - [Redis 内存碎片详解](./docs/database/redis/redis-memory-fragmentation.md)
 - [Redis 集群详解](./docs/database/redis/redis-cluster.md)
 
-## 搜索引擎
+## Bigdata
 
-用于提高搜索效率，功能和浏览器搜索引擎类似。比较常见的搜索引擎是 Elasticsearch（推荐） 和 Solr。
+## 数仓&数据中台
 
-![JavaGuide 官方公众号](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/gongzhonghaoxuanchuan.png)
+## Linux
+
+## Golang
+
+## PMP-ACP
 
 ## 开发工具
 
@@ -351,27 +360,3 @@ JVM 这部分内容主要参考 [JVM 虚拟机规范-Java8 ](https://docs.oracle
 ### 超时&重试
 
 [超时&重试](./docs/high-availability/timeout-and-retry.md)
-
-### 集群
-
-相同的服务部署多份，避免单点故障。
-
-### 灾备设计和异地多活
-
-**灾备**  = 容灾+备份。
-
-* **备份** ： 将系统所产生的的所有重要数据多备份几份。
-* **容灾** ： 在异地建立两个完全相同的系统。当某个地方的系统突然挂掉，整个应用系统可以切换到另一个，这样系统就可以正常提供服务了。
-
-**异地多活** 描述的是将服务部署在异地并且服务同时对外提供服务。和传统的灾备设计的最主要区别在于“多活”，即所有站点都是同时在对外提供服务的。异地多活是为了应对突发状况比如火灾、地震等自然或者人为灾害。
-
-## Star 趋势
-
-![](https://api.star-history.com/svg?repos=Snailclimb/JavaGuide&type=Date)
-
-## 公众号
-
-如果大家想要实时关注我更新的文章以及分享的干货的话，可以关注我的公众号。
-
-![JavaGuide 官方公众号](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/gongzhonghaoxuanchuan.png)
-
