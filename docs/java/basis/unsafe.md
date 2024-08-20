@@ -1,5 +1,5 @@
 ---
-title:  Java 魔法类 Unsafe 详解
+title: Java 魔法类 Unsafe 详解
 category: Java
 tag:
   - Java基础
@@ -7,7 +7,7 @@ tag:
 
 > 本文整理完善自下面这两篇优秀的文章：
 >
-> - [Java魔法类：Unsafe 应用解析 - 美团技术团队 -2019](https://tech.meituan.com/2019/02/14/talk-about-java-magic-class-unsafe.html)
+> - [Java 魔法类：Unsafe 应用解析 - 美团技术团队 -2019](https://tech.meituan.com/2019/02/14/talk-about-java-magic-class-unsafe.html)
 > - [Java 双刃剑之 Unsafe 类详解 - 码农参上 - 2021](https://xie.infoq.cn/article/8b6ed4195e475bfb32dacc5cb)
 
 阅读过 JUC 源码的同学，一定会发现很多并发工具类都调用了一个叫做 `Unsafe` 的类。
@@ -20,7 +20,7 @@ tag:
 
 另外，`Unsafe` 提供的这些功能的实现需要依赖本地方法（Native Method）。你可以将本地方法看作是 Java 中使用其他编程语言编写的方法。本地方法使用 **`native`** 关键字修饰，Java 代码中只是声明方法头，具体的实现则交给 **本地代码**。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/java/basis/unsafe/image-20220717115231125.png)
+![](https://oss.javaguide.cn/github/javaguide/java/basis/unsafe/image-20220717115231125.png)
 
 **为什么要使用本地方法呢？**
 
@@ -152,22 +152,22 @@ private void memoryTest() {
 
 先看结果输出：
 
-```
+```plain
 addr: 2433733895744
 addr3: 2433733894944
 16843009
 72340172838076673
 ```
 
-分析一下运行结果，首先使用`allocateMemory`方法申请 4 字节长度的内存空间，在循环中调用`setMemory`方法向每个字节写入内容为`byte`类型的 1，当使用 Unsafe 调用`getInt`方法时，因为一个`int`型变量占 4 个字节，会一次性读取 4 个字节，组成一个`int`的值，对应的十进制结果为 16843009。
+分析一下运行结果，首先使用`allocateMemory`方法申请 4 字节长度的内存空间，调用`setMemory`方法向每个字节写入内容为`byte`类型的 1，当使用 Unsafe 调用`getInt`方法时，因为一个`int`型变量占 4 个字节，会一次性读取 4 个字节，组成一个`int`的值，对应的十进制结果为 16843009。
 
 你可以通过下图理解这个过程：
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/java/basis/unsafe/image-20220717144344005.png)
+![](https://oss.javaguide.cn/github/javaguide/java/basis/unsafe/image-20220717144344005.png)
 
 在代码中调用`reallocateMemory`方法重新分配了一块 8 字节长度的内存空间，通过比较`addr`和`addr3`可以看到和之前申请的内存地址是不同的。在代码中的第二个 for 循环里，调用`copyMemory`方法进行了两次内存的拷贝，每次拷贝内存地址`addr`开始的 4 个字节，分别拷贝到以`addr3`和`addr3+4`开始的内存空间上：
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/java/basis/unsafe/image-20220717144354582.png)
+![](https://oss.javaguide.cn/github/javaguide/java/basis/unsafe/image-20220717144354582.png)
 
 拷贝完成后，使用`getLong`方法一次性读取 8 个字节，得到`long`类型的值为 72340172838076673。
 
@@ -275,7 +275,7 @@ public static void main(String[] args){
 
 运行结果：
 
-```
+```plain
 subThread change flag to:false
 detected flag changed
 main thread end
@@ -283,7 +283,7 @@ main thread end
 
 而如果删掉上面代码中的`loadFence`方法，那么主线程将无法感知到`flag`发生的变化，会一直在`while`中循环。可以用图来表示上面的过程：
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/java/basis/unsafe/image-20220717144703446.png)
+![](https://oss.javaguide.cn/github/javaguide/java/basis/unsafe/image-20220717144703446.png)
 
 了解 Java 内存模型（`JMM`）的小伙伴们应该清楚，运行中的线程不是直接读取主内存中的变量的，只能操作自己工作内存中的变量，然后同步到主内存中，并且线程的工作内存是不能共享的。上面的图中的流程就是子线程借助于主内存，将修改后的结果同步给了主线程，进而修改主线程中的工作空间，跳出循环。
 
@@ -303,6 +303,49 @@ public boolean validate(long stamp) {
 ### 对象操作
 
 #### 介绍
+
+**例子**
+
+```java
+import sun.misc.Unsafe;
+import java.lang.reflect.Field;
+
+public class Main {
+
+    private int value;
+
+    public static void main(String[] args) throws Exception{
+        Unsafe unsafe = reflectGetUnsafe();
+        assert unsafe != null;
+        long offset = unsafe.objectFieldOffset(Main.class.getDeclaredField("value"));
+        Main main = new Main();
+        System.out.println("value before putInt: " + main.value);
+        unsafe.putInt(main, offset, 42);
+        System.out.println("value after putInt: " + main.value);
+  System.out.println("value after putInt: " + unsafe.getInt(main, offset));
+    }
+
+    private static Unsafe reflectGetUnsafe() {
+        try {
+            Field field = Unsafe.class.getDeclaredField("theUnsafe");
+            field.setAccessible(true);
+            return (Unsafe) field.get(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+}
+```
+
+输出结果：
+
+```plain
+value before putInt: 0
+value after putInt: 42
+value after putInt: 42
+```
 
 **对象属性**
 
@@ -341,7 +384,7 @@ public native void putOrderedLong(Object o, long offset, long x);
 
 顺序写入与`volatile`写入的差别在于，在顺序写时加入的内存屏障类型为`StoreStore`类型，而在`volatile`写入时加入的内存屏障是`StoreLoad`类型，如下图所示：
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/java/basis/unsafe/image-20220717144834132.png)
+![](https://oss.javaguide.cn/github/javaguide/java/basis/unsafe/image-20220717144834132.png)
 
 在有序写入方法中，使用的是`StoreStore`屏障，该屏障确保`Store1`立刻刷新数据到内存，这一操作先于`Store2`以及后续的存储指令操作。而在`volatile`写入中，使用的是`StoreLoad`屏障，该屏障确保`Store1`立刻刷新数据到内存，这一操作先于`Load2`及后续的装载指令，并且，`StoreLoad`屏障会使该屏障之前的所有内存访问指令，包括存储指令和访问指令全部完成之后，才执行该屏障之后的内存访问指令。
 
@@ -374,11 +417,11 @@ public void objTest() throws Exception{
 }
 ```
 
-打印结果分别为 1、1、0，说明通过`allocateInstance`方法创建对象过程中，不会调用类的构造方法。使用这种方式创建对象时，只用到了`Class`对象，所以说如果想要跳过对象的初始化阶段或者跳过构造器的安全检查，就可以使用这种方法。在上面的例子中，如果将 A 类的构造函数改为`private`类型，将无法通过构造函数和反射创建对象，但`allocateInstance`方法仍然有效。
+打印结果分别为 1、1、0，说明通过`allocateInstance`方法创建对象过程中，不会调用类的构造方法。使用这种方式创建对象时，只用到了`Class`对象，所以说如果想要跳过对象的初始化阶段或者跳过构造器的安全检查，就可以使用这种方法。在上面的例子中，如果将 A 类的构造函数改为`private`类型，将无法通过构造函数和反射创建对象（可以通过构造函数对象 setAccessible 后创建对象），但`allocateInstance`方法仍然有效。
 
 #### 典型应用
 
-- **常规对象实例化方式**：我们通常所用到的创建对象的方式，从本质上来讲，都是通过 new 机制来实现对象的创建。但是，new 机制有个特点就是当类只提供有参的构造函数且无显示声明无参构造函数时，则必须使用有参构造函数进行对象构造，而使用有参构造函数时，必须传递相应个数的参数才能完成对象实例化。
+- **常规对象实例化方式**：我们通常所用到的创建对象的方式，从本质上来讲，都是通过 new 机制来实现对象的创建。但是，new 机制有个特点就是当类只提供有参的构造函数且无显式声明无参构造函数时，则必须使用有参构造函数进行对象构造，而使用有参构造函数时，必须传递相应个数的参数才能完成对象实例化。
 - **非常规的实例化方式**：而 Unsafe 中提供 allocateInstance 方法，仅通过 Class 对象就可以创建此类的实例对象，而且不需要调用其构造函数、初始化代码、JVM 安全检查等。它抑制修饰符检测，也就是即使构造器是 private 修饰的也能通过此方法实例化，只需提类对象即可创建相应的对象。由于这种特性，allocateInstance 在 java.lang.invoke、Objenesis（提供绕过类构造器的对象生成方式）、Gson（反序列化时用到）中都有相应的应用。
 
 ### 数组操作
@@ -396,9 +439,9 @@ public native int arrayIndexScale(Class<?> arrayClass);
 
 #### 典型应用
 
-这两个与数据操作相关的方法，在 `java.util.concurrent.atomic` 包下的 `AtomicIntegerArray`（可以实现对 `Integer` 数组中每个元素的原子性操作）中有典型的应用，如下图 `AtomicIntegerArray` 源码所示，通过 `Unsafe` 的 `arrayBaseOffset` 、`arrayIndexScale` 分别获取数组首元素的偏移地址 `base` 及单个元素大小因子 `scale` 。后续相关原子性操作，均依赖于这两个值进行数组中元素的定位，如下图二所示的 `getAndAdd` 方法即通过 `checkedByteOffset` 方法获取某数组元素的偏移地址，而后通过 CAS 实现原子性操作。
+这两个与数据操作相关的方法，在 `java.util.concurrent.atomic` 包下的 `AtomicIntegerArray`（可以实现对 `Integer` 数组中每个元素的原子性操作）中有典型的应用，如下图 `AtomicIntegerArray` 源码所示，通过 `Unsafe` 的 `arrayBaseOffset`、`arrayIndexScale` 分别获取数组首元素的偏移地址 `base` 及单个元素大小因子 `scale` 。后续相关原子性操作，均依赖于这两个值进行数组中元素的定位，如下图二所示的 `getAndAdd` 方法即通过 `checkedByteOffset` 方法获取某数组元素的偏移地址，而后通过 CAS 实现原子性操作。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/java/basis/unsafe/image-20220717144927257.png)
+![](https://oss.javaguide.cn/github/javaguide/java/basis/unsafe/image-20220717144927257.png)
 
 ### CAS 操作
 
@@ -408,7 +451,7 @@ public native int arrayIndexScale(Class<?> arrayClass);
 
 ```java
 /**
-	*  CAS
+  *  CAS
   * @param o         包含要修改field的对象
   * @param offset    对象中某field的偏移量
   * @param expected  期望值
@@ -467,13 +510,13 @@ private void increment(int x){
 
 运行代码会依次输出：
 
-```
+```plain
 1 2 3 4 5 6 7 8 9
 ```
 
 在上面的例子中，使用两个线程去修改`int`型属性`a`的值，并且只有在`a`的值等于传入的参数`x`减一时，才会将`a`的值变为`x`，也就是实现对`a`的加一的操作。流程如下所示：
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/java/basis/unsafe/image-20220717144939826.png)
+![](https://oss.javaguide.cn/github/javaguide/java/basis/unsafe/image-20220717144939826.png)
 
 需要注意的是，在调用`compareAndSwapInt`方法后，会直接返回`true`或`false`的修改结果，因此需要我们在代码中手动添加自旋的逻辑。在`AtomicInteger`类的设计中，也是采用了将`compareAndSwapInt`的结果作为循环条件，直至修改成功才退出死循环的方式来实现的原子性的自增操作。
 
@@ -519,7 +562,7 @@ public native boolean tryMonitorEnter(Object var1);
 
 #### 典型应用
 
-Java 锁和同步器框架的核心类 `AbstractQueuedSynchronizer` (AQS)，就是通过调用`LockSupport.park()`和`LockSupport.unpark()`实现线程的阻塞和唤醒的，而 `LockSupport` 的 `park` 、`unpark` 方法实际是调用 `Unsafe` 的 `park` 、`unpark` 方式实现的。
+Java 锁和同步器框架的核心类 `AbstractQueuedSynchronizer` (AQS)，就是通过调用`LockSupport.park()`和`LockSupport.unpark()`实现线程的阻塞和唤醒的，而 `LockSupport` 的 `park`、`unpark` 方法实际是调用 `Unsafe` 的 `park`、`unpark` 方式实现的。
 
 ```java
 public static void park(Object blocker) {
@@ -557,7 +600,7 @@ public static void main(String[] args) {
 
 程序输出为：
 
-```
+```plain
 park main mainThread
 subThread try to unpark mainThread
 unpark mainThread success
@@ -565,7 +608,7 @@ unpark mainThread success
 
 程序运行的流程也比较容易看懂，子线程开始运行后先进行睡眠，确保主线程能够调用`park`方法阻塞自己，子线程在睡眠 5 秒后，调用`unpark`方法唤醒主线程，使主线程能继续向下执行。整个流程如下图所示：
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/java/basis/unsafe/image-20220717144950116.png)
+![](https://oss.javaguide.cn/github/javaguide/java/basis/unsafe/image-20220717144950116.png)
 
 ### Class 操作
 
@@ -580,7 +623,7 @@ unpark mainThread success
 public native long staticFieldOffset(Field f);
 //获取静态属性的对象指针
 public native Object staticFieldBase(Field f);
-//判断类是否需要实例化（用于获取类的静态属性前进行检测）
+//判断类是否需要初始化（用于获取类的静态属性前进行检测）
 public native boolean shouldBeInitialized(Class<?> c);
 ```
 
@@ -594,6 +637,11 @@ public class User {
 }
 private void staticTest() throws Exception {
     User user=new User();
+    // 也可以用下面的语句触发类初始化
+    // 1.
+    // unsafe.ensureClassInitialized(User.class);
+    // 2.
+    // System.out.println(User.name);
     System.out.println(unsafe.shouldBeInitialized(User.class));
     Field sexField = User.class.getDeclaredField("name");
     long fieldOffset = unsafe.staticFieldOffset(sexField);
@@ -605,16 +653,18 @@ private void staticTest() throws Exception {
 
 运行结果：
 
-```
-falseHydra
+```plain
+false
+Hydra
 ```
 
 在 `Unsafe` 的对象操作中，我们学习了通过`objectFieldOffset`方法获取对象属性偏移量并基于它对变量的值进行存取，但是它不适用于类中的静态属性，这时候就需要使用`staticFieldOffset`方法。在上面的代码中，只有在获取`Field`对象的过程中依赖到了`Class`，而获取静态变量的属性时不再依赖于`Class`。
 
-在上面的代码中首先创建一个`User`对象，这是因为如果一个类没有被实例化，那么它的静态属性也不会被初始化，最后获取的字段属性将是`null`。所以在获取静态属性前，需要调用`shouldBeInitialized`方法，判断在获取前是否需要初始化这个类。如果删除创建 User 对象的语句，运行结果会变为：
+在上面的代码中首先创建一个`User`对象，这是因为如果一个类没有被初始化，那么它的静态属性也不会被初始化，最后获取的字段属性将是`null`。所以在获取静态属性前，需要调用`shouldBeInitialized`方法，判断在获取前是否需要初始化这个类。如果删除创建 User 对象的语句，运行结果会变为：
 
-```
-truenull
+```plain
+true
+null
 ```
 
 **使用`defineClass`方法允许程序在运行时动态地创建一个类**
@@ -644,7 +694,7 @@ private static void defineTest() {
 
 在上面的代码中，首先读取了一个`class`文件并通过文件流将它转化为字节数组，之后使用`defineClass`方法动态的创建了一个类，并在后续完成了它的实例化工作，流程如下图所示，并且通过这种方式创建的类，会跳过 JVM 的所有安全检查。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/java/basis/unsafe/image-20220717145000710.png)
+![](https://oss.javaguide.cn/github/javaguide/java/basis/unsafe/image-20220717145000710.png)
 
 除了`defineClass`方法外，Unsafe 还提供了一个`defineAnonymousClass`方法：
 
@@ -678,3 +728,5 @@ public native int pageSize();
 ## 总结
 
 在本文中，我们首先介绍了 `Unsafe` 的基本概念、工作原理，并在此基础上，对它的 API 进行了说明与实践。相信大家通过这一过程，能够发现 `Unsafe` 在某些场景下，确实能够为我们提供编程中的便利。但是回到开头的话题，在使用这些便利时，确实存在着一些安全上的隐患，在我看来，一项技术具有不安全因素并不可怕，可怕的是它在使用过程中被滥用。尽管之前有传言说会在 Java9 中移除 `Unsafe` 类，不过它还是照样已经存活到了 Java16。按照存在即合理的逻辑，只要使用得当，它还是能给我们带来不少的帮助，因此最后还是建议大家，在使用 `Unsafe` 的过程中一定要做到使用谨慎使用、避免滥用。
+
+<!-- @include: @article-footer.snippet.md -->

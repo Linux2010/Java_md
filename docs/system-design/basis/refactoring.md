@@ -1,11 +1,11 @@
 ---
-title:  代码重构指南
+title: 代码重构指南
 category: 代码质量
 ---
 
 前段时间重读了[《重构：改善代码既有设计》](https://book.douban.com/subject/30468597/)，收货颇多。于是，简单写了一篇文章来聊聊我对重构的看法。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/image-20220311155746549.png)
+![](https://oss.javaguide.cn/github/javaguide/image-20220311155746549.png)
 
 ## 何谓重构？
 
@@ -14,23 +14,21 @@ category: 代码质量
 > - 重构（名词）：对软件内部结构的一种调整，目的是在不改变软件可观察行为的前提下，提高其可理解性，降低其修改成本。
 > - 重构（动词）：使用一系列重构手法，在不改变软件可观察行为的前提下，调整其结构。
 
-用更贴近工程师的语言来说： **重构就是利用设计模式(如组合模式、策略模式、责任链模式)、软件设计原则（如 SOLID 原则、YAGNI 原则、KISS 原则）和重构手段（如封装、继承、构建测试体系）来让代码更容易理解，更易于修改。**
+用更贴近工程师的语言来说：**重构就是利用设计模式(如组合模式、策略模式、责任链模式)、软件设计原则（如 SOLID 原则、YAGNI 原则、KISS 原则）和重构手段（如封装、继承、构建测试体系）来让代码更容易理解，更易于修改。**
 
 软件设计原则指导着我们组织和规范代码，同时，重构也是为了能够尽量设计出尽量满足软件设计原则的软件。
 
 正确重构的核心在于 **步子一定要小，每一步的重构都不会影响软件的正常运行，可以随时停止重构。**
 
-**常见的设计模式如下** ：
+**常见的设计模式如下**：
 
-![常见的设计模式](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/image-20220311160610999.png)
-
-
+![常见的设计模式](https://oss.javaguide.cn/github/javaguide/system-design/basis/common-design-patterns.png)
 
 更全面的设计模式总结，可以看 **[java-design-patterns](https://github.com/iluwatar/java-design-patterns)** 这个开源项目。
 
-**常见的软件设计原则如下** ：
+**常见的软件设计原则如下**：
 
-![常见的软件设计原](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/programming-principles%20.png)
+![常见的软件设计原则](https://oss.javaguide.cn/github/javaguide/system-design/basis/programming-principles.png)
 
 更全面的设计原则总结，可以看 **[java-design-patterns](https://github.com/iluwatar/java-design-patterns)** 和 **[hacker-laws-zh](https://github.com/nusr/hacker-laws-zh)** 这两个开源项目。
 
@@ -40,17 +38,17 @@ category: 代码质量
 
 如果对应到一个真实的项目，重构具体能为我们带来什么好处呢？
 
-1. **让代码更容易理解** ： 通过添加注释、命名规范、逻辑优化等手段可以让我们的代码更容易被理解；
-2. **避免代码腐化** ：通过重构干掉坏味道代码；
-3. **加深对代码的理解** ：重构代码的过程会加深你对某部分代码的理解；
-4. **发现潜在 bug** ：是这样的，很多潜在的 bug ，都是我们在重构的过程中发现的；
-5. ......
+1. **让代码更容易理解**：通过添加注释、命名规范、逻辑优化等手段可以让我们的代码更容易被理解；
+2. **避免代码腐化**：通过重构干掉坏味道代码；
+3. **加深对代码的理解**：重构代码的过程会加深你对某部分代码的理解；
+4. **发现潜在 bug**：是这样的，很多潜在的 bug ，都是我们在重构的过程中发现的；
+5. ……
 
 看了上面介绍的关于重构带来的好处之后，你会发现重构的最终目标是 **提高软件开发速度和质量** 。
 
 重构并不会减慢软件开发速度，相反，如果代码质量和软件设计较差，当我们想要添加新功能的话，开发速度会越来越慢。到了最后，甚至都有想要重写整个系统的冲动。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/bad&good-design.png)
+![](https://oss.javaguide.cn/github/javaguide/bad&good-design.png)
 
 《重构：改善代码既有设计》这本书中这样说：
 
@@ -70,7 +68,7 @@ category: 代码质量
 
 项目团队的每一个人只有保证自己的提交没有让项目代码变得更腐化，项目代码才会朝着健康的方向发展。
 
-**当我们离开营地（项目代码）的时候，请不要留下垃圾（代码花味道）！尽量确保营地变得更干净了！**
+**当我们离开营地（项目代码）的时候，请不要留下垃圾（代码坏味道）！尽量确保营地变得更干净了！**
 
 ### 开发一个新功能之后&之前
 
@@ -80,7 +78,7 @@ category: 代码质量
 
 有一个两顶帽子的比喻：在我开发新功能之前，我发现重构可以让新功能的开发更容易，于是我戴上了重构的帽子。重构之后，我换回原来的帽子，继续开发新能功能。新功能开发完成之后，我又发现自己的代码难以理解，于是我又戴上了重构帽子。比较好的开发状态就是就是这样在重构和开发新功能之间来回切换。
 
-![refractor-two-hats](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/refractor-two-hats.png)
+![refractor-two-hats](https://oss.javaguide.cn/github/javaguide/refractor-two-hats.png)
 
 ### Code Review 之后
 
@@ -124,7 +122,7 @@ Code Review 可以非常有效提高代码的整体质量，它会帮助我们�
 - 学习了某个设计模式/工程实践之后，不顾项目实际情况，刻意使用在项目上（避免货物崇拜编程）；
 - 项目进展比较急的时候，重构项目调用的某个 API 的底层代码（重构之后对项目调用这个 API 并没有带来什么价值）；
 - 重写比重构更容易更省事；
-- ......
+- ……
 
 ### 遵循方法
 
@@ -134,5 +132,13 @@ Code Review 可以非常有效提高代码的整体质量，它会帮助我们�
 
 除了可以在重构项目代码的过程中练习精进重构之外，你还可以有下面这些手段：
 
-- [重构实战练习](https://linesh.gitbook.io/refactoring/) ：通过几个小案例一步一步带你学习重构！
-- [设计模式+重构学习网站](https://refactoringguru.cn/) ：免费在线学习代码重构、 设计模式、 SOLID 原则 （单一职责、 开闭原则、 里氏替换、 接口隔离以及依赖反转） 。
+- [重构实战练习](https://linesh.gitbook.io/refactoring/)：通过几个小案例一步一步带你学习重构！
+- [设计模式+重构学习网站](https://refactoringguru.cn/)：免费在线学习代码重构、 设计模式、 SOLID 原则 （单一职责、 开闭原则、 里氏替换、 接口隔离以及依赖反转） 。
+- [IDEA 官方文档的代码重构教程](https://www.jetbrains.com/help/idea/refactoring-source-code.html#popular-refactorings)：教你如何使用 IDEA 进行重构。
+
+## 参考
+
+- [再读《重构》- ThoughtWorks 洞见 - 2020](https://insights.thoughtworks.cn/reread-refactoring/)：详细介绍了重构的要点比如小步重构、捡垃圾式的重构，主要是重构概念相关的介绍。
+- [常见代码重构技巧 - VectorJin - 2021](https://juejin.cn/post/6954378167947624484)：从软件设计原则、设计模式、代码分层、命名规范等角度介绍了如何进行重构，比较偏实战。
+
+<!-- @include: @article-footer.snippet.md -->

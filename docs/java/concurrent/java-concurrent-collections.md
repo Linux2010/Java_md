@@ -1,5 +1,5 @@
 ---
-title:  Java 常见并发容器总结
+title: Java 常见并发容器总结
 category: Java
 tag:
   - Java并发
@@ -19,76 +19,27 @@ JDK 提供的这些容器大部分在 `java.util.concurrent` 包中。
 
 所以就有了 `HashMap` 的线程安全版本—— `ConcurrentHashMap` 的诞生。
 
-在 `ConcurrentHashMap` 中，无论是读操作还是写操作都能保证很高的性能：在进行读操作时(几乎)不需要加锁，而在写操作时通过锁分段技术只对所操作的段加锁而不影响客户端对其它段的访问。
+在 JDK1.7 的时候，`ConcurrentHashMap` 对整个桶数组进行了分割分段(`Segment`，分段锁)，每一把锁只锁容器其中一部分数据（下面有示意图），多线程访问容器里不同数据段的数据，就不会存在锁竞争，提高并发访问率。
+
+到了 JDK1.8 的时候，`ConcurrentHashMap` 已经摒弃了 `Segment` 的概念，而是直接用 `Node` 数组+链表+红黑树的数据结构来实现，并发控制使用 `synchronized` 和 CAS 来操作。（JDK1.6 以后 `synchronized` 锁做了很多优化） 整个看起来就像是优化过且线程安全的 `HashMap`，虽然在 JDK1.8 中还能看到 `Segment` 的数据结构，但是已经简化了属性，只是为了兼容旧版本。
+
+关于 `ConcurrentHashMap` 的详细介绍，请看我写的这篇文章：[`ConcurrentHashMap` 源码分析](./../collection/concurrent-hash-map-source-code.md)。
 
 ## CopyOnWriteArrayList
 
-### CopyOnWriteArrayList 简介
+在 JDK1.5 之前，如果想要使用并发安全的 `List` 只能选择 `Vector`。而 `Vector` 是一种老旧的集合，已经被淘汰。`Vector` 对于增删改查等方法基本都加了 `synchronized`，这种方式虽然能够保证同步，但这相当于对整个 `Vector` 加上了一把大锁，使得每个方法执行的时候都要去获得锁，导致性能非常低下。
 
-```java
-public class CopyOnWriteArrayList<E>
-extends Object
-implements List<E>, RandomAccess, Cloneable, Serializable
-```
+JDK1.5 引入了 `Java.util.concurrent`（JUC）包，其中提供了很多线程安全且并发性能良好的容器，其中唯一的线程安全 `List` 实现就是 `CopyOnWriteArrayList` 。
 
-在很多应用场景中，读操作可能会远远大于写操作。由于读操作根本不会修改原有的数据，因此对于每次读取都进行加锁其实是一种资源浪费。我们应该允许多个线程同时访问 `List` 的内部数据，毕竟读取操作是安全的。
+对于大部分业务场景来说，读取操作往往是远大于写入操作的。由于读取操作不会对原有数据进行修改，因此，对于每次读取都进行加锁其实是一种资源浪费。相比之下，我们应该允许多个线程同时访问 `List` 的内部数据，毕竟对于读取操作来说是安全的。
 
-这和我们之前在多线程章节讲过 `ReentrantReadWriteLock` 读写锁的思想非常类似，也就是读读共享、写写互斥、读写互斥、写读互斥。JDK 中提供了 `CopyOnWriteArrayList` 类比相比于在读写锁的思想又更进一步。为了将读取的性能发挥到极致，`CopyOnWriteArrayList` 读取是完全不用加锁的，并且更厉害的是：写入也不会阻塞读取操作。只有写入和写入之间需要进行同步等待。这样一来，读操作的性能就会大幅度提升。**那它是怎么做的呢？**
+这种思路与 `ReentrantReadWriteLock` 读写锁的设计思想非常类似，即读读不互斥、读写互斥、写写互斥（只有读读不互斥）。`CopyOnWriteArrayList` 更进一步地实现了这一思想。为了将读操作性能发挥到极致，`CopyOnWriteArrayList` 中的读取操作是完全无需加锁的。更加厉害的是，写入操作也不会阻塞读取操作，只有写写才会互斥。这样一来，读操作的性能就可以大幅度提升。
 
-### CopyOnWriteArrayList 是如何做到的？
+`CopyOnWriteArrayList` 线程安全的核心在于其采用了 **写时复制（Copy-On-Write）** 的策略，从 `CopyOnWriteArrayList` 的名字就能看出了。
 
-`CopyOnWriteArrayList` 类的所有可变操作（add，set 等等）都是通过创建底层数组的新副本来实现的。当 List 需要被修改的时候，我并不修改原有内容，而是对原有数据进行一次复制，将修改的内容写入副本。写完之后，再将修改完的副本替换原来的数据，这样就可以保证写操作不会影响读操作了。
+当需要修改（ `add`，`set`、`remove` 等操作） `CopyOnWriteArrayList` 的内容时，不会直接修改原数组，而是会先创建底层数组的副本，对副本数组进行修改，修改完之后再将修改后的数组赋值回去，这样就可以保证写操作不会影响读操作了。
 
-从 `CopyOnWriteArrayList` 的名字就能看出 `CopyOnWriteArrayList` 是满足 `CopyOnWrite` 的。所谓 `CopyOnWrite` 也就是说：在计算机，如果你想要对一块内存进行修改时，我们不在原有内存块中进行写操作，而是将内存拷贝一份，在新的内存中进行写操作，写完之后呢，就将指向原来内存指针指向新的内存，原来的内存就可以被回收掉了。
-
-### CopyOnWriteArrayList 读取和写入源码简单分析
-
-#### CopyOnWriteArrayList 读取操作的实现
-
-读取操作没有任何同步控制和锁操作，理由就是内部数组 `array` 不会发生修改，只会被另外一个 `array` 替换，因此可以保证数据安全。
-
-```java
-    /** The array, accessed only via getArray/setArray. */
-    private transient volatile Object[] array;
-    public E get(int index) {
-        return get(getArray(), index);
-    }
-    @SuppressWarnings("unchecked")
-    private E get(Object[] a, int index) {
-        return (E) a[index];
-    }
-    final Object[] getArray() {
-        return array;
-    }
-
-```
-
-#### 3.3.2 CopyOnWriteArrayList 写入操作的实现
-
-`CopyOnWriteArrayList` 写入操作 `add()`方法在添加集合的时候加了锁，保证了同步，避免了多线程写的时候会 copy 出多个副本出来。
-
-```java
-    /**
-     * Appends the specified element to the end of this list.
-     *
-     * @param e element to be appended to this list
-     * @return {@code true} (as specified by {@link Collection#add})
-     */
-    public boolean add(E e) {
-        final ReentrantLock lock = this.lock;
-        lock.lock();//加锁
-        try {
-            Object[] elements = getArray();
-            int len = elements.length;
-            Object[] newElements = Arrays.copyOf(elements, len + 1);//拷贝新数组
-            newElements[len] = e;
-            setArray(newElements);
-            return true;
-        } finally {
-            lock.unlock();//释放锁
-        }
-    }
-```
+关于 `CopyOnWriteArrayList` 的详细介绍，请看我写的这篇文章：[`CopyOnWriteArrayList` 源码分析](./../collection/copyonwritearraylist-source-code.md)。
 
 ## ConcurrentLinkedQueue
 
@@ -108,9 +59,9 @@ Java 提供的线程安全的 `Queue` 可以分为**阻塞队列**和**非阻塞
 
 `BlockingQueue` 是一个接口，继承自 `Queue`，所以其实现类也可以作为 `Queue` 的实现来使用，而 `Queue` 又继承自 `Collection` 接口。下面是 `BlockingQueue` 的相关实现类：
 
-![BlockingQueue 的实现类](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-12-9/51622268.jpg)
+![BlockingQueue 的实现类](https://oss.javaguide.cn/github/javaguide/java/51622268.jpg)
 
-下面主要介绍一下 3 个常见的 `BlockingQueue` 的实现类：`ArrayBlockingQueue`、`LinkedBlockingQueue` 、`PriorityBlockingQueue` 。
+下面主要介绍一下 3 个常见的 `BlockingQueue` 的实现类：`ArrayBlockingQueue`、`LinkedBlockingQueue`、`PriorityBlockingQueue` 。
 
 ### ArrayBlockingQueue
 
@@ -173,7 +124,7 @@ private static ArrayBlockingQueue<Integer> blockingQueue = new ArrayBlockingQueu
 
 ## ConcurrentSkipListMap
 
-下面这部分内容参考了极客时间专栏[《数据结构与算法之美》](https://time.geekbang.org/column/intro/126?code=zl3GYeAsRI4rEJIBNu5B/km7LSZsPDlGWQEpAYw5Vu0=&utm_term=SPoster "《数据结构与算法之美》")以及《实战 Java 高并发程序设计》。
+> 下面这部分内容参考了极客时间专栏[《数据结构与算法之美》](https://time.geekbang.org/column/intro/126?code=zl3GYeAsRI4rEJIBNu5B/km7LSZsPDlGWQEpAYw5Vu0=&utm_term=SPoster "《数据结构与算法之美》")以及《实战 Java 高并发程序设计》。
 
 为了引出 `ConcurrentSkipListMap`，先带着大家简单理解一下跳表。
 
@@ -181,13 +132,13 @@ private static ArrayBlockingQueue<Integer> blockingQueue = new ArrayBlockingQueu
 
 跳表的本质是同时维护了多个链表，并且链表是分层的，
 
-![2级索引跳表](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-12-9/93666217.jpg)
+![2级索引跳表](https://oss.javaguide.cn/github/javaguide/java/93666217.jpg)
 
 最低层的链表维护了跳表内所有的元素，每上面一层链表都是下面一层的子集。
 
 跳表内的所有链表的元素都是排序的。查找时，可以从顶级链表开始找。一旦发现被查找的元素大于当前链表中的取值，就会转入下一层链表继续找。这也就是说在查找过程中，搜索是跳跃式的。如上图所示，在跳表中查找元素 18。
 
-![在跳表中查找元素18](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-12-9/32005738.jpg)
+![在跳表中查找元素18](https://oss.javaguide.cn/github/javaguide/java/32005738.jpg)
 
 查找 18 的时候原来需要遍历 18 次，现在只需要 7 次即可。针对链表长度比较大的时候，构建索引查找效率的提升就会非常明显。
 
@@ -198,5 +149,7 @@ private static ArrayBlockingQueue<Integer> blockingQueue = new ArrayBlockingQueu
 ## 参考
 
 - 《实战 Java 高并发程序设计》
-- https://javadoop.com/post/java-concurrent-queue
-- https://juejin.im/post/5aeebd02518825672f19c546
+- <https://javadoop.com/post/java-concurrent-queue>
+- <https://juejin.im/post/5aeebd02518825672f19c546>
+
+<!-- @include: @article-footer.snippet.md -->

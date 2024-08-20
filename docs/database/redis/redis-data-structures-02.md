@@ -1,37 +1,45 @@
 ---
-title: Redis 3 种特殊数据结构详解
+title: Redis 3 种特殊数据类型详解
 category: 数据库
 tag:
   - Redis
 head:
   - - meta
     - name: keywords
-      content: Redis常见数据结构
+      content: Redis常见数据类型
   - - meta
     - name: description
-      content: Redis特殊数据结构总结：HyperLogLogs（基数统计）、Bitmap （位存储）、Geospatial (地理位置)。
+      content: Redis特殊数据类型总结：HyperLogLogs（基数统计）、Bitmap （位存储）、Geospatial (地理位置)。
 ---
 
-## Bitmap
+除了 5 种基本的数据类型之外，Redis 还支持 3 种特殊的数据类型：Bitmap、HyperLogLog、GEO。
+
+## Bitmap （位图）
 
 ### 介绍
+
+根据官网介绍：
+
+> Bitmaps are not an actual data type, but a set of bit-oriented operations defined on the String type which is treated like a bit vector. Since strings are binary safe blobs and their maximum length is 512 MB, they are suitable to set up to 2^32 different bits.
+>
+> Bitmap 不是 Redis 中的实际数据类型，而是在 String 类型上定义的一组面向位的操作，将其视为位向量。由于字符串是二进制安全的块，且最大长度为 512 MB，它们适合用于设置最多 2^32 个不同的位。
 
 Bitmap 存储的是连续的二进制数字（0 和 1），通过 Bitmap, 只需要一个 bit 位来表示某个元素对应的值或者状态，key 就是对应元素本身 。我们知道 8 个 bit 可以组成一个 byte，所以 Bitmap 本身会极大的节省储存空间。
 
 你可以将 Bitmap 看作是一个存储二进制数字（0 和 1）的数组，数组中每个元素的下标叫做 offset（偏移量）。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/database/redis/image-20220720194154133.png)
+![](https://oss.javaguide.cn/github/javaguide/database/redis/image-20220720194154133.png)
 
 ### 常用命令
 
-| 命令                                  | 介绍                                                         |
-| ------------------------------------- | ------------------------------------------------------------ |
-| SETBIT key offset value               | 设置指定 offset 位置的值                                     |
-| GETBIT key offset                     | 获取指定 offset 位置的值                                     |
-| BITCOUNT key start end                | 获取 start 和 end 之前值为 1 的元素个数                      |
+| 命令                                  | 介绍                                                             |
+| ------------------------------------- | ---------------------------------------------------------------- |
+| SETBIT key offset value               | 设置指定 offset 位置的值                                         |
+| GETBIT key offset                     | 获取指定 offset 位置的值                                         |
+| BITCOUNT key start end                | 获取 start 和 end 之前值为 1 的元素个数                          |
 | BITOP operation destkey key1 key2 ... | 对一个或多个 Bitmap 进行运算，可用运算符有 AND, OR, XOR 以及 NOT |
 
-**Bitmap 基本操作演示** ：
+**Bitmap 基本操作演示**：
 
 ```bash
 # SETBIT 会返回之前位的值（默认是 0）这里会生成 7 个位
@@ -54,10 +62,10 @@ Bitmap 存储的是连续的二进制数字（0 和 1），通过 Bitmap, 只需
 
 **需要保存状态信息（0/1 即可表示）的场景**
 
-- 举例 ：用户签到情况、活跃用户情况、用户行为统计（比如是否点赞过某个视频）。
-- 相关命令 ：`SETBIT`、`GETBIT`、`BITCOUNT`、`BITOP`。
+- 举例：用户签到情况、活跃用户情况、用户行为统计（比如是否点赞过某个视频）。
+- 相关命令：`SETBIT`、`GETBIT`、`BITCOUNT`、`BITOP`。
 
-## HyperLogLog
+## HyperLogLog（基数统计）
 
 ### 介绍
 
@@ -65,32 +73,34 @@ HyperLogLog 是一种有名的基数计数概率算法 ，基于 LogLog Counting
 
 Redis 提供的 HyperLogLog 占用空间非常非常小，只需要 12k 的空间就能存储接近`2^64`个不同元素。这是真的厉害，这就是数学的魅力么！并且，Redis 对 HyperLogLog 的存储结构做了优化，采用两种方式计数：
 
-- **稀疏矩阵** ：计数较少的时候，占用空间很小。
-- **稠密矩阵** ：计数达到某个阈值的时候，占用 12k 的空间。
+- **稀疏矩阵**：计数较少的时候，占用空间很小。
+- **稠密矩阵**：计数达到某个阈值的时候，占用 12k 的空间。
 
 Redis 官方文档中有对应的详细说明：
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/database/redis/image-20220721091424563.png)
+![](https://oss.javaguide.cn/github/javaguide/database/redis/image-20220721091424563.png)
 
-基数计数概率算法为了节省内存并不会直接存储元数据，而是通过一定的概率统计方法预估基数值（集合中包含元素的个数）。因此， HyperLogLog 的计数结果并不是一个精确值，存在一定的误差（标准误差为 `0.81%` 。）。
+基数计数概率算法为了节省内存并不会直接存储元数据，而是通过一定的概率统计方法预估基数值（集合中包含元素的个数）。因此， HyperLogLog 的计数结果并不是一个精确值，存在一定的误差（标准误差为 `0.81%` ）。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/database/redis/image-20220720194154133.png)
+![](https://oss.javaguide.cn/github/javaguide/database/redis/image-20220720194154133.png)
 
 HyperLogLog 的使用非常简单，但原理非常复杂。HyperLogLog 的原理以及在 Redis 中的实现可以看这篇文章：[HyperLogLog 算法的原理讲解以及 Redis 是如何应用它的](https://juejin.cn/post/6844903785744056333) 。
 
 再推荐一个可以帮助理解 HyperLogLog 原理的工具：[Sketch of the Day: HyperLogLog — Cornerstone of a Big Data Infrastructure](http://content.research.neustar.biz/blog/hll.html) 。
 
+除了 HyperLogLog 之外，Redis 还提供了其他的概率数据结构，对应的官方文档地址：<https://redis.io/docs/data-types/probabilistic/> 。
+
 ### 常用命令
 
 HyperLogLog 相关的命令非常少，最常用的也就 3 个。
 
-| 命令                                      | 介绍                                                         |
-| ----------------------------------------- | ------------------------------------------------------------ |
-| PFADD key element1 element2 ...           | 添加一个或多个元素到 HyperLogLog 中                          |
-| PFCOUNT key1 key2                         | 获取一个或者多个 HyperLogLog 的唯一计数。                    |
+| 命令                                      | 介绍                                                                             |
+| ----------------------------------------- | -------------------------------------------------------------------------------- |
+| PFADD key element1 element2 ...           | 添加一个或多个元素到 HyperLogLog 中                                              |
+| PFCOUNT key1 key2                         | 获取一个或者多个 HyperLogLog 的唯一计数。                                        |
 | PFMERGE destkey sourcekey1 sourcekey2 ... | 将多个 HyperLogLog 合并到 destkey 中，destkey 会结合多个源，算出对应的唯一计数。 |
 
-**HyperLogLog 基本操作演示** ：
+**HyperLogLog 基本操作演示**：
 
 ```bash
 > PFADD hll foo bar zap
@@ -115,10 +125,10 @@ HyperLogLog 相关的命令非常少，最常用的也就 3 个。
 
 **数量量巨大（百万、千万级别以上）的计数场景**
 
-- 举例 ：热门网站每日/每周/每月访问 ip 数统计、热门帖子 uv 统计、
-- 相关命令 ：`PFADD`、`PFCOUNT` 。
+- 举例：热门网站每日/每周/每月访问 ip 数统计、热门帖子 uv 统计、
+- 相关命令：`PFADD`、`PFCOUNT` 。
 
-## Geospatial index
+## Geospatial (地理位置)
 
 ### 介绍
 
@@ -126,19 +136,19 @@ Geospatial index（地理空间索引，简称 GEO） 主要用于存储地理�
 
 通过 GEO 我们可以轻松实现两个位置距离的计算、获取指定位置附近的元素等功能。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/database/redis/image-20220720194359494.png)
+![](https://oss.javaguide.cn/github/javaguide/database/redis/image-20220720194359494.png)
 
 ### 常用命令
 
-| 命令                                             | 介绍                                                         |
-| ------------------------------------------------ | ------------------------------------------------------------ |
-| GEOADD key longitude1 latitude1 member1 ...      | 添加一个或多个元素对应的经纬度信息到 GEO 中                  |
-| GEOPOS key member1 member2 ...                   | 返回给定元素的经纬度信息                                     |
-| GEODIST key member1 member2 M/KM/FT/MI           | 返回两个给定元素之间的距离                                   |
+| 命令                                             | 介绍                                                                                                 |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| GEOADD key longitude1 latitude1 member1 ...      | 添加一个或多个元素对应的经纬度信息到 GEO 中                                                          |
+| GEOPOS key member1 member2 ...                   | 返回给定元素的经纬度信息                                                                             |
+| GEODIST key member1 member2 M/KM/FT/MI           | 返回两个给定元素之间的距离                                                                           |
 | GEORADIUS key longitude latitude radius distance | 获取指定位置附近 distance 范围内的其他元素，支持 ASC(由近到远)、DESC（由远到近）、Count(数量) 等参数 |
-| GEORADIUSBYMEMBER key member radius distance     | 类似于 GEORADIUS 命令，只是参照的中心点是 GEO 中的元素       |
+| GEORADIUSBYMEMBER key member radius distance     | 类似于 GEORADIUS 命令，只是参照的中心点是 GEO 中的元素                                               |
 
-**基本操作** ：
+**基本操作**：
 
 ```bash
 > GEOADD personLocation 116.33 39.89 user1 116.34 39.90 user2 116.35 39.88 user3
@@ -154,9 +164,9 @@ Geospatial index（地理空间索引，简称 GEO） 主要用于存储地理�
 
 GEO 中存储的地理位置信息的经纬度数据通过 GeoHash 算法转换成了一个整数，这个整数作为 Sorted Set 的 score(权重参数)使用。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/database/redis/image-20220721201545147.png)
+![](https://oss.javaguide.cn/github/javaguide/database/redis/image-20220721201545147.png)
 
-**获取指定位置范围内的其他元素** ：
+**获取指定位置范围内的其他元素**：
 
 ```bash
 > GEORADIUS personLocation 116.33 39.87 3 km
@@ -178,7 +188,7 @@ user2
 
 `GEORADIUS` 命令的底层原理解析可以看看阿里的这篇文章：[Redis 到底是怎么实现“附近的人”这个功能的呢？](https://juejin.cn/post/6844903966061363207) 。
 
-**移除元素** ：
+**移除元素**：
 
 GEO 底层是 Sorted Set ，你可以对 GEO 使用 Sorted Set 相关的命令。
 
@@ -199,8 +209,18 @@ user2
 - 举例：附近的人。
 - 相关命令: `GEOADD`、`GEORADIUS`、`GEORADIUSBYMEMBER` 。
 
+## 总结
+
+| 数据类型         | 说明                                                                                                                                                                                                                                                                  |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Bitmap           | 你可以将 Bitmap 看作是一个存储二进制数字（0 和 1）的数组，数组中每个元素的下标叫做 offset（偏移量）。通过 Bitmap, 只需要一个 bit 位来表示某个元素对应的值或者状态，key 就是对应元素本身 。我们知道 8 个 bit 可以组成一个 byte，所以 Bitmap 本身会极大的节省储存空间。 |
+| HyperLogLog      | Redis 提供的 HyperLogLog 占用空间非常非常小，只需要 12k 的空间就能存储接近`2^64`个不同元素。不过，HyperLogLog 的计数结果并不是一个精确值，存在一定的误差（标准误差为 `0.81%` ）。                                                                                     |
+| Geospatial index | Geospatial index（地理空间索引，简称 GEO） 主要用于存储地理位置信息，基于 Sorted Set 实现。                                                                                                                                                                           |
+
 ## 参考
 
-- Redis Data Structures ：https://redis.com/redis-enterprise/data-structures/ 。
+- Redis Data Structures：<https://redis.com/redis-enterprise/data-structures/> 。
 - 《Redis 深度历险：核心原理与应用实践》1.6 四两拨千斤——HyperLogLog
-- 布隆过滤器,位图,HyperLogLog：https://hogwartsrico.github.io/2020/06/08/BloomFilter-HyperLogLog-BitMap/index.html
+- 布隆过滤器,位图,HyperLogLog：<https://hogwartsrico.github.io/2020/06/08/BloomFilter-HyperLogLog-BitMap/index.html>
+
+<!-- @include: @article-footer.snippet.md -->

@@ -1,12 +1,12 @@
 ---
-title:  Java 语法糖详解
+title: Java 语法糖详解
 category: Java
 tag:
   - Java基础
 head:
   - - meta
     - name: keywords
-      content:  Java 语法糖
+      content: Java 语法糖
   - - meta
     - name: description
       content: 这篇文章介绍了 12 种 Java 中常用的语法糖。所谓语法糖就是提供给开发人员便于开发的一种语法而已。但是这种语法只有开发人员认识。要想被执行，需要进行解糖，即转成 JVM 认识的语法。当我们把语法糖解糖之后，你就会发现其实我们日常使用的这些方便的语法，其实都是一些其他更简单的语法构成的。有了这些语法糖，我们在日常开发的时候可以大大提升效率，但是同时也要避免过渡使用。使用之前最好了解下原理，避免掉坑。
@@ -14,8 +14,7 @@ head:
 
 > 作者：Hollis
 >
-> 原文：https://mp.weixin.qq.com/s/o4XdEMq1DL-nBS-f8Za5Aw
->
+> 原文：<https://mp.weixin.qq.com/s/o4XdEMq1DL-nBS-f8Za5Aw>
 
 语法糖是大厂 Java 面试常问的一个知识点。
 
@@ -25,7 +24,7 @@ head:
 
 **语法糖（Syntactic Sugar）** 也称糖衣语法，是英国计算机学家 Peter.J.Landin 发明的一个术语，指在计算机语言中添加的某种语法，这种语法对语言的功能并没有影响，但是更方便程序员使用。简而言之，语法糖让程序更加简洁，有更高的可读性。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/java/basis/syntactic-sugar/image-20220818175953954.png)
+![](https://oss.javaguide.cn/github/javaguide/java/basis/syntactic-sugar/image-20220818175953954.png)
 
 > 有意思的是，在编程领域，除了语法糖，还有语法盐和语法糖精的说法，篇幅有限这里不做扩展了。
 
@@ -45,9 +44,9 @@ Java 中最常用的语法糖主要有泛型、变长参数、条件编译、自
 
 前面提到过，从 Java 7 开始，Java 语言中的语法糖在逐渐丰富，其中一个比较重要的就是 Java 7 中`switch`开始支持`String`。
 
-在开始之前先科普下，Java 中的`switch`自身原本就支持基本类型。比如`int`、`char`等。对于`int`类型，直接进行数值的比较。对于`char`类型则是比较其 ascii 码。所以，对于编译器来说，`switch`中其实只能使用整型，任何类型的比较都要转换成整型。比如`byte`。`short`，`char`(ackii 码是整型)以及`int`。
+在开始之前先科普下，Java 中的`switch`自身原本就支持基本类型。比如`int`、`char`等。对于`int`类型，直接进行数值的比较。对于`char`类型则是比较其 ascii 码。所以，对于编译器来说，`switch`中其实只能使用整型，任何类型的比较都要转换成整型。比如`byte`。`short`，`char`(ascii 码是整型)以及`int`。
 
-那么接下来看下`switch`对`String`得支持，有以下代码：
+那么接下来看下`switch`对`String`的支持，有以下代码：
 
 ```java
 public class switchDemoString {
@@ -108,7 +107,7 @@ public class switchDemoString
 
 也就是说，**对于 Java 虚拟机来说，他根本不认识`Map<String, String> map`这样的语法。需要在编译阶段通过类型擦除的方式进行解语法糖。**
 
-类型擦除的主要过程如下： 1.将所有的泛型参数用其最左边界（最顶级的父类型）类型替换。 2.移除所有的类型参数。
+类型擦除的主要过程如下：1.将所有的泛型参数用其最左边界（最顶级的父类型）类型替换。 2.移除所有的类型参数。
 
 以下代码：
 
@@ -247,7 +246,7 @@ public static transient void print(String strs[])
 }
 ```
 
-从反编译后代码可以看出，可变参数在被使用的时候，他首先会创建一个数组，数组的长度就是调用该方法是传递的实参的个数，然后再把参数值全部放到这个数组当中，然后再把这个数组作为参数传递到被调用的方法中。
+从反编译后代码可以看出，可变参数在被使用的时候，他首先会创建一个数组，数组的长度就是调用该方法是传递的实参的个数，然后再把参数值全部放到这个数组当中，然后再把这个数组作为参数传递到被调用的方法中。（注：`trasient` 仅在修饰成员变量时有意义，此处 “修饰方法” 是由于在 javassist 中使用相同数值分别表示 `trasient` 以及 `vararg`，见 [此处](https://github.com/jboss-javassist/javassist/blob/7302b8b0a09f04d344a26ebe57f29f3db43f2a3e/src/main/javassist/bytecode/AccessFlag.java#L32)。）
 
 ### 枚举
 
@@ -338,7 +337,7 @@ public class OutterClass {
 }
 ```
 
-以上代码编译后会生成两个 class 文件：`OutterClass$InnerClass.class` 、`OutterClass.class` 。当我们尝试对`OutterClass.class`文件进行反编译的时候，命令行会打印以下内容：`Parsing OutterClass.class...Parsing inner class OutterClass$InnerClass.class... Generating OutterClass.jad` 。他会把两个文件全部进行反编译，然后一起生成一个`OutterClass.jad`文件。文件内容如下：
+以上代码编译后会生成两个 class 文件：`OutterClass$InnerClass.class`、`OutterClass.class` 。当我们尝试对`OutterClass.class`文件进行反编译的时候，命令行会打印以下内容：`Parsing OutterClass.class...Parsing inner class OutterClass$InnerClass.class... Generating OutterClass.jad` 。他会把两个文件全部进行反编译，然后一起生成一个`OutterClass.jad`文件。文件内容如下：
 
 ```java
 public class OutterClass
@@ -651,7 +650,7 @@ public static transient void main(String args[])
 
 ### Lambda 表达式
 
-关于 lambda 表达式，有人可能会有质疑，因为网上有人说他并不是语法糖。其实我想纠正下这个说法。**Labmda 表达式不是匿名内部类的语法糖，但是他也是一个语法糖。实现方式其实是依赖了几个 JVM 底层提供的 lambda 相关 api。**
+关于 lambda 表达式，有人可能会有质疑，因为网上有人说他并不是语法糖。其实我想纠正下这个说法。**Lambda 表达式不是匿名内部类的语法糖，但是他也是一个语法糖。实现方式其实是依赖了几个 JVM 底层提供的 lambda 相关 api。**
 
 先来看一个简单的 lambda 表达式。遍历一个 list：
 
@@ -759,7 +758,8 @@ class GT<T>{
 
 以上代码输出结果为：2！
 
-由于经过类型擦除，所有的泛型类实例都关联到同一份字节码上，泛型类的所有静态变量是共享的。
+有些同学可能会误认为泛型类是不同的类，对应不同的字节码，其实
+由于经过类型擦除，所有的泛型类实例都关联到同一份字节码上，泛型类的静态变量是共享的。上面例子里的`GT<Integer>.var`和`GT<String>.var`其实是一个变量。
 
 ### 自动装箱与拆箱
 
@@ -778,7 +778,7 @@ public static void main(String[] args) {
 
 输出结果：
 
-```
+```plain
 a == b is false
 c == d is true
 ```
@@ -804,10 +804,10 @@ Iterator 是工作在一个独立的线程中，并且拥有一个 mutex 锁。 
 
 所以 `Iterator` 在工作的时候是不允许被迭代的对象被改变的。但你可以使用 `Iterator` 本身的方法`remove()`来删除对象，`Iterator.remove()` 方法会在删除当前迭代对象的同时维护索引的一致性。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/java/basis/syntactic-sugar/image-20220818175912313.png)
-
 ## 总结
 
 前面介绍了 12 种 Java 中常用的语法糖。所谓语法糖就是提供给开发人员便于开发的一种语法而已。但是这种语法只有开发人员认识。要想被执行，需要进行解糖，即转成 JVM 认识的语法。当我们把语法糖解糖之后，你就会发现其实我们日常使用的这些方便的语法，其实都是一些其他更简单的语法构成的。
 
-有了这些语法糖，我们在日常开发的时候可以大大提升效率，但是同时也要避免过渡使用。使用之前最好了解下原理，避免掉坑。
+有了这些语法糖，我们在日常开发的时候可以大大提升效率，但是同时也要避过度使用。使用之前最好了解下原理，避免掉坑。
+
+<!-- @include: @article-footer.snippet.md -->

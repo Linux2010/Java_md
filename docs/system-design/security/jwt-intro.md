@@ -5,6 +5,8 @@ tag:
   - 安全
 ---
 
+<!-- @include: @article-header.snippet.md -->
+
 ## 什么是 JWT?
 
 JWT （JSON Web Token） 是目前最流行的跨域认证解决方案，是一种基于 Token 的认证授权机制。 从 JWT 的全称可以看出，JWT 本身也是 Token，一种规范化之后的 JSON 结构的 Token。
@@ -15,7 +17,7 @@ JWT 自身包含了身份验证所需要的所有信息，因此，我们的服�
 
 并且， 使用 JWT 认证可以有效避免 CSRF 攻击，因为 JWT 一般是存在在 localStorage 中，使用 JWT 进行身份验证的过程中是不会涉及到 Cookie 的。
 
-我在 [JWT 优缺点分析](./advantages&disadvantages-of-jwt.md)这篇文章中有详细介绍到使用 JWT 做身份认证的优势和劣势。
+我在 [JWT 优缺点分析](./advantages-and-disadvantages-of-jwt.md)这篇文章中有详细介绍到使用 JWT 做身份认证的优势和劣势。
 
 下面是 [RFC 7519](https://tools.ietf.org/html/rfc7519) 对 JWT 做的较为正式的定义。
 
@@ -23,19 +25,19 @@ JWT 自身包含了身份验证所需要的所有信息，因此，我们的服�
 
 ## JWT 由哪些部分组成？
 
-![此图片来源于：https://supertokens.com/blog/oauth-vs-jwt](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/javaguide/system-design/jwt/jwt-composition.png)
+![JWT 组成](https://oss.javaguide.cn/javaguide/system-design/jwt/jwt-composition.png)
 
 JWT 本质上就是一组字串，通过（`.`）切分成三个为 Base64 编码的部分：
 
-- **Header** : 描述 JWT 的元数据，定义了生成签名的算法以及 `Token` 的类型。
-- **Payload** : 用来存放实际需要传递的数据
-- **Signature（签名）** ：服务器通过 Payload、Header 和一个密钥(Secret)使用 Header 里面指定的签名算法（默认是 HMAC SHA256）生成。
+- **Header（头部）** : 描述 JWT 的元数据，定义了生成签名的算法以及 `Token` 的类型。Header 被 Base64Url 编码后成为 JWT 的第一部分。
+- **Payload（载荷）** : 用来存放实际需要传递的数据，包含声明（Claims），如`sub`（subject，主题）、`jti`（JWT ID）。Payload 被 Base64Url 编码后成为 JWT 的第二部分。
+- **Signature（签名）**：服务器通过 Payload、Header 和一个密钥(Secret)使用 Header 里面指定的签名算法（默认是 HMAC SHA256）生成。生成的签名会成为 JWT 的第三部分。
 
 JWT 通常是这样的：`xxxxx.yyyyy.zzzzz`。
 
 示例：
 
-```
+```plain
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
 eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.
 SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
@@ -45,14 +47,14 @@ SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 
 Header 和 Payload 都是 JSON 格式的数据，Signature 由 Payload、Header 和 Secret(密钥)通过特定的计算公式和加密算法得到。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/javaguide/system-design/jwt/jwt.io.png)
+![](https://oss.javaguide.cn/javaguide/system-design/jwt/jwt.io.png)
 
 ### Header
 
 Header 通常由两部分组成：
 
 - `typ`（Type）：令牌类型，也就是 JWT。
-- `alg`（Algorithm） ：签名算法，比如 HS256。
+- `alg`（Algorithm）：签名算法，比如 HS256。
 
 示例：
 
@@ -71,9 +73,9 @@ Payload 也是 JSON 格式数据，其中包含了 Claims(声明，包含 JWT �
 
 Claims 分为三种类型：
 
-- **Registered Claims（注册声明）** ：预定义的一些声明，建议使用，但不是强制性的。
-- **Public Claims（公有声明）** ：JWT 签发方可以自定义的声明，但是为了避免冲突，应该在 [IANA JSON Web Token Registry](https://www.iana.org/assignments/jwt/jwt.xhtml) 中定义它们。
-- **Private Claims（私有声明）** ：JWT 签发方因为项目需要而自定义的声明，更符合实际项目场景使用。
+- **Registered Claims（注册声明）**：预定义的一些声明，建议使用，但不是强制性的。
+- **Public Claims（公有声明）**：JWT 签发方可以自定义的声明，但是为了避免冲突，应该在 [IANA JSON Web Token Registry](https://www.iana.org/assignments/jwt/jwt.xhtml) 中定义它们。
+- **Private Claims（私有声明）**：JWT 签发方因为项目需要而自定义的声明，更符合实际项目场景使用。
 
 下面是一些常见的注册声明：
 
@@ -114,7 +116,7 @@ Signature 部分是对前两部分的签名，作用是防止 JWT（主要是 pa
 
 签名的计算公式如下：
 
-```
+```plain
 HMACSHA256(
   base64UrlEncode(header) + "." +
   base64UrlEncode(payload),
@@ -127,7 +129,7 @@ HMACSHA256(
 
 在基于 JWT 进行身份验证的的应用程序中，服务器通过 Payload、Header 和 Secret(密钥)创建 JWT 并将 JWT 发送给客户端。客户端接收到 JWT 之后，会将其保存在 Cookie 或者 localStorage 里面，以后客户端发出的所有请求都会携带这个令牌。
 
-![ JWT 身份验证示意图](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/jwt/jwt-authentication%20process.png)
+![ JWT 身份验证示意图](https://oss.javaguide.cn/github/javaguide/system-design/jwt/jwt-authentication%20process.png)
 
 简化后的步骤如下：
 
@@ -145,11 +147,11 @@ HMACSHA256(
 
 ## 如何防止 JWT 被篡改？
 
-有了签名之后，即使 JWT 被泄露或者解惑，黑客也没办法同时篡改 Signature 、Header 、Payload。
+有了签名之后，即使 JWT 被泄露或者截获，黑客也没办法同时篡改 Signature、Header、Payload。
 
 这是为什么呢？因为服务端拿到 JWT 之后，会解析出其中包含的 Header、Payload 以及 Signature 。服务端会根据 Header、Payload、密钥再次生成一个 Signature。拿新生成的 Signature 和 JWT 中的 Signature 作对比，如果一样就说明 Header 和 Payload 没有被修改。
 
-不过，如果服务端的秘钥也被泄露的话，黑客就可以同时篡改 Signature 、Header 、Payload 了。黑客直接修改了 Header 和 Payload 之后，再重新生成一个 Signature 就可以了。
+不过，如果服务端的秘钥也被泄露的话，黑客就可以同时篡改 Signature、Header、Payload 了。黑客直接修改了 Header 和 Payload 之后，再重新生成一个 Signature 就可以了。
 
 **密钥一定保管好，一定不要泄露出去。JWT 安全的核心在于签名，签名安全的核心在密钥。**
 
@@ -161,4 +163,6 @@ HMACSHA256(
 4. 一定不要将隐私信息存放在 Payload 当中。
 5. 密钥一定保管好，一定不要泄露出去。JWT 安全的核心在于签名，签名安全的核心在密钥。
 6. Payload 要加入 `exp` （JWT 的过期时间），永久有效的 JWT 不合理。并且，JWT 的过期时间不易过长。
-7. ......
+7. ……
+
+<!-- @include: @article-footer.snippet.md -->

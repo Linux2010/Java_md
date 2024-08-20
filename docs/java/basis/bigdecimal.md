@@ -46,7 +46,7 @@ System.out.println(a == b);// false
 
 《阿里巴巴 Java 开发手册》中提到：**浮点数之间的等值判断，基本数据类型不能用 == 来比较，包装数据类型不能用 equals 来判断。**
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/javaguide/image-20211213101646884.png)
+![](https://oss.javaguide.cn/javaguide/image-20211213101646884.png)
 
 具体原因我们在上面已经详细介绍了，这里就不多提了。
 
@@ -71,7 +71,7 @@ System.out.println(x.compareTo(y));// 0
 
 《阿里巴巴 Java 开发手册》对这部分内容也有提到，如下图所示。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/javaguide/image-20211213102222601.png)
+![](https://oss.javaguide.cn/javaguide/image-20211213102222601.png)
 
 ### 加减乘除
 
@@ -101,19 +101,19 @@ public BigDecimal divide(BigDecimal divisor, int scale, RoundingMode roundingMod
 public enum RoundingMode {
    // 2.5 -> 3 , 1.6 -> 2
    // -1.6 -> -2 , -2.5 -> -3
-			 UP(BigDecimal.ROUND_UP),
+   UP(BigDecimal.ROUND_UP),
    // 2.5 -> 2 , 1.6 -> 1
    // -1.6 -> -1 , -2.5 -> -2
-			 DOWN(BigDecimal.ROUND_DOWN),
-			 // 2.5 -> 3 , 1.6 -> 2
+   DOWN(BigDecimal.ROUND_DOWN),
+   // 2.5 -> 3 , 1.6 -> 2
    // -1.6 -> -1 , -2.5 -> -2
-			 CEILING(BigDecimal.ROUND_CEILING),
-			 // 2.5 -> 2 , 1.6 -> 1
+   CEILING(BigDecimal.ROUND_CEILING),
+   // 2.5 -> 2 , 1.6 -> 1
    // -1.6 -> -2 , -2.5 -> -3
-			 FLOOR(BigDecimal.ROUND_FLOOR),
-   	// 2.5 -> 3 , 1.6 -> 2
+   FLOOR(BigDecimal.ROUND_FLOOR),
+   // 2.5 -> 3 , 1.6 -> 2
    // -1.6 -> -2 , -2.5 -> -3
-			 HALF_UP(BigDecimal.ROUND_HALF_UP),
+   HALF_UP(BigDecimal.ROUND_HALF_UP),
    //......
 }
 ```
@@ -142,7 +142,7 @@ System.out.println(n);// 1.255
 
 《阿里巴巴 Java 开发手册》中提到：
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/java/basis/image-20220714161315993.png)
+![](https://oss.javaguide.cn/github/javaguide/java/basis/image-20220714161315993.png)
 
 `BigDecimal` 使用 `equals()` 方法进行等值比较出现问题的代码示例：
 
@@ -156,7 +156,7 @@ System.out.println(a.equals(b));//false
 
 1.0 的 scale 是 1，1 的 scale 是 0，因此 `a.equals(b)` 的结果是 false。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/java/basis/image-20220714164706390.png)
+![](https://oss.javaguide.cn/github/javaguide/java/basis/image-20220714164706390.png)
 
 `compareTo()` 方法可以比较两个 `BigDecimal` 的值，如果相等就返回 0，如果第 1 个数比第 2 个数大则返回 1，反之返回-1。
 
@@ -256,7 +256,7 @@ public class BigDecimalUtil {
         }
         BigDecimal b1 = BigDecimal.valueOf(v1);
         BigDecimal b2 = BigDecimal.valueOf(v2);
-        return b1.divide(b2, scale, RoundingMode.HALF_UP).doubleValue();
+        return b1.divide(b2, scale, RoundingMode.HALF_EVEN).doubleValue();
     }
 
     /**
@@ -351,8 +351,14 @@ public class BigDecimalUtil {
 }
 ```
 
+相关 issue：[建议对保留规则设置为 RoundingMode.HALF_EVEN,即四舍六入五成双,#2129](https://github.com/Snailclimb/JavaGuide/issues/2129) 。
+
+![RoundingMode.HALF_EVEN](https://oss.javaguide.cn/github/javaguide/java/basis/RoundingMode.HALF_EVEN.png)
+
 ## 总结
 
 浮点数没有办法用二进制精确表示，因此存在精度丢失的风险。
 
 不过，Java 提供了`BigDecimal` 来操作浮点数。`BigDecimal` 的实现利用到了 `BigInteger` （用来操作大整数）, 所不同的是 `BigDecimal` 加入了小数位的概念。
+
+<!-- @include: @article-footer.snippet.md -->

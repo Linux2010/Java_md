@@ -7,14 +7,16 @@ tag:
 
 **Java 11** 于 2018 年 9 月 25 日正式发布，这是很重要的一个版本！Java 11 和 2017 年 9 月份发布的 Java 9 以及 2018 年 3 月份发布的 Java 10 相比，其最大的区别就是：在长期支持(Long-Term-Support)方面，**Oracle 表示会对 Java 11 提供大力支持，这一支持将会持续至 2026 年 9 月。这是据 Java 8 以后支持的首个长期版本。**
 
-![](https://img-blog.csdnimg.cn/20210603202746605.png)
+下面这张图是 Oracle 官方给出的 Oracle JDK 支持的时间线。
 
-**概览（精选了一部分）** ：
+![](https://oss.javaguide.cn/github/javaguide/java/new-features/4c1611fad59449edbbd6e233690e9fa7.png)
+
+**概览（精选了一部分）**：
 
 - [JEP 321：HTTP Client 标准化](https://openjdk.java.net/jeps/321)
 - [JEP 333：ZGC(可伸缩低延迟垃圾收集器)](https://openjdk.java.net/jeps/333)
 - [JEP 323：Lambda 参数的局部变量语法](https://openjdk.java.net/jeps/323)
-- [JEP 330：启动单文件源代码程序](https://openjdk.java.net/jeps/330) 
+- [JEP 330：启动单文件源代码程序](https://openjdk.java.net/jeps/330)
 
 ## HTTP Client 标准化
 
@@ -61,7 +63,7 @@ Java 11 增加了一系列的字符串处理方法：
 
 ## Optional 增强
 
-新增了`empty()`方法来判断指定的 `Optional` 对象是否为空。
+新增了`isEmpty()`方法来判断指定的 `Optional` 对象是否为空。
 
 ```java
 var op = Optional.empty();
@@ -86,7 +88,7 @@ ZGC 目前 **处在实验阶段**，只支持 Linux/x64 平台。
 
 在 ZGC 中出现 Stop The World 的情况会更少！
 
-详情可以看 ： [《新一代垃圾回收器 ZGC 的探索与实践》](https://tech.meituan.com/2020/08/06/new-zgc-practice-in-meituan.html)
+详情可以看：[《新一代垃圾回收器 ZGC 的探索与实践》](https://tech.meituan.com/2020/08/06/new-zgc-practice-in-meituan.html)
 
 ## Lambda 参数的局部变量语法
 
@@ -115,13 +117,15 @@ Consumer<String> consumer = (String i) -> System.out.println(i);
 
 ## 其他新特性
 
-- **新的垃圾回收器 Epsilon** ：一个完全消极的 GC 实现，分配有限的内存资源，最大限度的降低内存占用和内存吞吐延迟时间
-- **低开销的 Heap Profiling** ：Java 11 中提供一种低开销的 Java 堆分配采样方法，能够得到堆分配的 Java 对象信息，并且能够通过 JVMTI 访问堆信息
-- **TLS1.3 协议** ：Java 11 中包含了传输层安全性（TLS）1.3 规范（RFC 8446）的实现，替换了之前版本中包含的 TLS，包括 TLS 1.2，同时还改进了其他 TLS 功能，例如 OCSP 装订扩展（RFC 6066，RFC 6961），以及会话散列和扩展主密钥扩展（RFC 7627），在安全性和性能方面也做了很多提升
-- **飞行记录器(Java Flight Recorder)** ：飞行记录器之前是商业版 JDK 的一项分析工具，但在 Java 11 中，其代码被包含到公开代码库中，这样所有人都能使用该功能了。
-- ......
+- **新的垃圾回收器 Epsilon**：一个完全消极的 GC 实现，分配有限的内存资源，最大限度的降低内存占用和内存吞吐延迟时间
+- **低开销的 Heap Profiling**：Java 11 中提供一种低开销的 Java 堆分配采样方法，能够得到堆分配的 Java 对象信息，并且能够通过 JVMTI 访问堆信息
+- **TLS1.3 协议**：Java 11 中包含了传输层安全性（TLS）1.3 规范（RFC 8446）的实现，替换了之前版本中包含的 TLS，包括 TLS 1.2，同时还改进了其他 TLS 功能，例如 OCSP 装订扩展（RFC 6066，RFC 6961），以及会话散列和扩展主密钥扩展（RFC 7627），在安全性和性能方面也做了很多提升
+- **飞行记录器(Java Flight Recorder)**：飞行记录器之前是商业版 JDK 的一项分析工具，但在 Java 11 中，其代码被包含到公开代码库中，这样所有人都能使用该功能了。
+- ……
 
 ## 参考
 
-- JDK 11 Release Notes：https://www.oracle.com/java/technologies/javase/11-relnote-issues.html
-- Java 11 – Features and Comparison： <https://www.geeksforgeeks.org/java-11-features-and-comparison/>
+- JDK 11 Release Notes：<https://www.oracle.com/java/technologies/javase/11-relnote-issues.html>
+- Java 11 – Features and Comparison：<https://www.geeksforgeeks.org/java-11-features-and-comparison/>
+
+<!-- @include: @article-footer.snippet.md -->

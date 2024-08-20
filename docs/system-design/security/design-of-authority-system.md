@@ -12,9 +12,11 @@ head:
       content: 基于角色的访问控制（Role-Based Access Control，简称 RBAC）指的是通过用户的角色（Role）授权其相关权限，实现了灵活的访问控制，相比直接授予用户权限，要更加简单、高效、可扩展。
 ---
 
+<!-- @include: @article-header.snippet.md -->
+
 > 作者：转转技术团队
 >
-> 原文：https://mp.weixin.qq.com/s/ONMuELjdHYa0yQceTj01Iw
+> 原文：<https://mp.weixin.qq.com/s/ONMuELjdHYa0yQceTj01Iw>
 
 ## 老权限系统的问题与现状
 
@@ -41,7 +43,7 @@ head:
 
 用一个图来描述如下：
 
-![RBAC 权限模型示意图](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/security/design-of-authority-system/rbac.png)
+![RBAC 权限模型示意图](https://oss.javaguide.cn/github/javaguide/system-design/security/design-of-authority-system/rbac.png)
 
 当使用 `RBAC模型` 时，通过分析用户的实际情况，基于共同的职责和需求，授予他们不同角色。这种 `用户 -> 角色 -> 权限` 间的关系，让我们可以不用再单独管理单个用户权限，用户从授予的角色里面获取所需的权限。
 
@@ -83,9 +85,9 @@ head:
 
 **新权限系统的权限模型**：用户最终权限 = 用户拥有的角色带来的权限 + 用户独立配置的权限，两者取并集。
 
-新权限系统方案如下图 ：
+新权限系统方案如下图：
 
-![新权限系统方案](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/security/design-of-authority-system/new-authority-system-design.png)
+![新权限系统方案](https://oss.javaguide.cn/github/javaguide/system-design/security/design-of-authority-system/new-authority-system-design.png)
 
 - 首先，将集团所有的用户（包括外部用户），通过 **统一登录与注册** 功能实现了统一管理，同时与公司的组织架构信息模块打通，实现了同一个人员在所有系统中信息的一致，这也为后续基于组织架构进行权限管理提供了可行性。
 - 其次，因为新权限系统需要服务集团所有业务，所以需要支持多系统权限管理。用户进行权限管理前，需要先选择相应的系统，然后配置该系统的 **菜单权限** 和 **数据权限** 信息，建立好系统的各个权限点。_PS：菜单权限和数据权限的具体说明，下文会详细介绍。_
@@ -108,7 +110,7 @@ head:
 
 ### 权限类型的定义
 
-新权限系统中，我们把权限分为两大类，分别是 ：
+新权限系统中，我们把权限分为两大类，分别是：
 
 - **菜单功能权限**：包括系统的目录导航、菜单的访问权限，以及按钮和 API 操作的权限
 - **数据权限**：包括定义数据的查询范围权限，在不同系统中，通常叫做 “组织”、”站点“等，在新权限系统中，统一称作 ”组织“ 来管理数据权限
@@ -140,7 +142,7 @@ head:
 
 其中，1、2、3 的步骤，都是在系统管理模块完成，具体流程如下图:
 
-![系统接入流程图](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/security/design-of-authority-system/new-authority-system-design-access-flow-chart.png)
+![系统接入流程图](https://oss.javaguide.cn/github/javaguide/system-design/security/design-of-authority-system/new-authority-system-design-access-flow-chart.png)
 
 用户可以对系统的基本信息进行增删改查的操作，不同系统之间通过 `系统编码` 作为唯一区分。同时 `系统编码` 也会用作于菜单和数据权限编码的前缀，通过这样的设计保证权限编码全局唯一性。
 
@@ -148,34 +150,34 @@ head:
 
 系统管理界面设计如下：
 
-![系统管理界面设计](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/security/design-of-authority-system/new-authority-system-management-interface.png)
+![系统管理界面设计](https://oss.javaguide.cn/github/javaguide/system-design/security/design-of-authority-system/new-authority-system-management-interface.png)
 
 #### 菜单管理
 
 新权限系统首先对菜单进行了分类，分别是 `目录`、`菜单` 和 `操作`，示意如下图
 
-![菜单管理界面](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/security/design-of-authority-system/new-authority-system-menu.png)
+![菜单管理界面](https://oss.javaguide.cn/github/javaguide/system-design/security/design-of-authority-system/new-authority-system-menu.png)
 
 它们分别代表的含义是：
 
-- **目录** ：指的是应用系统中最顶部的一级目录，通常在系统 Logo 的右边
-- **菜单** ：指的是应用系统左侧的多层级菜单，通常在系统 Logo 的下面，也是最常用的菜单结构
-- **操作** ：指页面中的按钮、接口等一系列可以定义为操作或页面元素的部分。
+- **目录**：指的是应用系统中最顶部的一级目录，通常在系统 Logo 的右边
+- **菜单**：指的是应用系统左侧的多层级菜单，通常在系统 Logo 的下面，也是最常用的菜单结构
+- **操作**：指页面中的按钮、接口等一系列可以定义为操作或页面元素的部分。
 
 菜单管理界面设计如下：
 
-![菜单管理界面设计](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/security/design-of-authority-system/new-authority-system-menu-management-interface.png)
+![菜单管理界面设计](https://oss.javaguide.cn/github/javaguide/system-design/security/design-of-authority-system/new-authority-system-menu-management-interface.png)
 
 菜单权限数据的使用，也提供两种方式：
 
-- **动态菜单模式** ：这种模式下，菜单的增删完全由权限系统接管。也就是说在权限系统增加菜单，应用系统会同步增加。这种模式好处是修改菜单无需项目上线。
-- **静态菜单模式** ：菜单的增删由应用系统的前端控制，权限系统只控制访问权限。这种模式下，权限系统只能标识出用户是否拥有当前菜单的权限，而具体的显示控制是由前端根据权限数据来决定。
+- **动态菜单模式**：这种模式下，菜单的增删完全由权限系统接管。也就是说在权限系统增加菜单，应用系统会同步增加。这种模式好处是修改菜单无需项目上线。
+- **静态菜单模式**：菜单的增删由应用系统的前端控制，权限系统只控制访问权限。这种模式下，权限系统只能标识出用户是否拥有当前菜单的权限，而具体的显示控制是由前端根据权限数据来决定。
 
 ### 角色与用户管理
 
 角色与用户管理都是可以直接改变用户权限的核心模块，整个设计思路如下图：
 
-![角色与用户管理模块设计](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/security/design-of-authority-system/role-and-user-management.png)
+![角色与用户管理模块设计](https://oss.javaguide.cn/github/javaguide/system-design/security/design-of-authority-system/role-and-user-management.png)
 
 这个模块设计重点是需要考虑到批量操作。无论是通过角色关联用户，还是给用户批量增加/删除/重置权限，批量操作的场景都是系统需要设计好的。
 
@@ -183,14 +185,14 @@ head:
 
 除了给其他用户添加权限外，新权限系统同时支持了用户自主申请权限。这个模块除了常规的审批流（申请、审批、查看）等，有一个比较特别的功能，就是如何让用户能选对自己要的权限。所以在该模块的设计上，除了直接选择角色外，还支持通过菜单/数据权限点，反向选择角色，如下图：
 
-![权限申请界面](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/security/design-of-authority-system/permission-application.png)
+![权限申请界面](https://oss.javaguide.cn/github/javaguide/system-design/security/design-of-authority-system/permission-application.png)
 
 ### 操作日志
 
 系统操作日志会分为两大类：
 
-1. **操作流水日志** ：用户可看、可查的关键操作日志
-2. **服务 Log 日志** ：系统服务运行过程中产生的 Log 日志,其中，服务 Log 日志信息量大于操作流水日志，但是不方便搜索查看。所以权限系统需要提供操作流水日志功能。
+1. **操作流水日志**：用户可看、可查的关键操作日志
+2. **服务 Log 日志**：系统服务运行过程中产生的 Log 日志,其中，服务 Log 日志信息量大于操作流水日志，但是不方便搜索查看。所以权限系统需要提供操作流水日志功能。
 
 在新权限系统中，用户所有的操作可以分为三类，分别为新增、更新、删除。所有的模块也可枚举，例如用户管理、角色管理、菜单管理等。明确这些信息后，那么一条日志就可以抽象为：什么人(Who)在什么时间(When)对哪些人(Target)的哪些模块做了哪些操作。
 这样把所有的记录都入库，就可以方便的进行日志的查看和筛选了。
@@ -206,4 +208,6 @@ head:
 
 ## 参考
 
-- 选择合适的权限模型：https://docs.authing.cn/v2/guides/access-control/choose-the-right-access-control-model.html
+- 选择合适的权限模型：<https://docs.authing.cn/v2/guides/access-control/choose-the-right-access-control-model.html>
+
+<!-- @include: @article-footer.snippet.md -->

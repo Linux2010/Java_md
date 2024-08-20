@@ -1,5 +1,5 @@
 ---
-title:  Java IO设计模式总结
+title: Java IO 设计模式总结
 category: Java
 tag:
   - Java IO
@@ -118,8 +118,8 @@ BufferedReader bufferedReader = new BufferedReader(isr);
 
 ```java
 public class InputStreamReader extends Reader {
-	//用于解码的对象
-	private final StreamDecoder sd;
+ //用于解码的对象
+ private final StreamDecoder sd;
     public InputStreamReader(InputStream in) {
         super(in);
         try {
@@ -130,7 +130,7 @@ public class InputStreamReader extends Reader {
         }
     }
     // 使用 StreamDecoder 对象做具体的读取工作
-	public int read() throws IOException {
+ public int read() throws IOException {
         return sd.read();
     }
 }
@@ -174,7 +174,7 @@ StreamDecoder(InputStream in, Object lock, CharsetDecoder dec) {
 
 适配器和适配者两者不需要继承相同的抽象类或者实现相同的接口。
 
-另外，`FutrueTask` 类使用了适配器模式，`Executors` 的内部类 `RunnableAdapter` 实现属于适配器，用于将 `Runnable` 适配成 `Callable`。
+另外，`FutureTask` 类使用了适配器模式，`Executors` 的内部类 `RunnableAdapter` 实现属于适配器，用于将 `Runnable` 适配成 `Callable`。
 
 `FutureTask`参数包含 `Runnable` 的一个构造方法：
 
@@ -215,7 +215,7 @@ static final class RunnableAdapter<T> implements Callable<T> {
 工厂模式用于创建对象，NIO 中大量用到了工厂模式，比如 `Files` 类的 `newInputStream` 方法用于创建 `InputStream` 对象（静态工厂）、 `Paths` 类的 `get` 方法创建 `Path` 对象（静态工厂）、`ZipFileSystem` 类（`sun.nio`包下的类，属于 `java.nio` 相关的一些内部实现）的 `getPath` 的方法创建 `Path` 对象（简单工厂）。
 
 ```java
-InputStream is Files.newInputStream(Paths.get(generatorLogoPath))
+InputStream is = Files.newInputStream(Paths.get(generatorLogoPath))
 ```
 
 ## 观察者模式
@@ -262,7 +262,7 @@ WatchKey register(WatchService watcher,
 
 常用的监听事件有 3 种：
 
-- `StandardWatchEventKinds.ENTRY_CREATE` ：文件创建。
+- `StandardWatchEventKinds.ENTRY_CREATE`：文件创建。
 - `StandardWatchEventKinds.ENTRY_DELETE` : 文件删除。
 - `StandardWatchEventKinds.ENTRY_MODIFY` : 文件修改。
 
@@ -314,6 +314,8 @@ class PollingWatchService
 
 ## 参考
 
-- Patterns in Java APIs：http://cecs.wright.edu/~tkprasad/courses/ceg860/paper/node26.html
-- 装饰器模式：通过剖析 Java IO 类库源码学习装饰器模式：https://time.geekbang.org/column/article/204845
-- sun.nio 包是什么，是 java 代码么？ - RednaxelaFX https://www.zhihu.com/question/29237781/answer/43653953
+- Patterns in Java APIs：<http://cecs.wright.edu/~tkprasad/courses/ceg860/paper/node26.html>
+- 装饰器模式：通过剖析 Java IO 类库源码学习装饰器模式：<https://time.geekbang.org/column/article/204845>
+- sun.nio 包是什么，是 java 代码么？ - RednaxelaFX <https://www.zhihu.com/question/29237781/answer/43653953>
+
+<!-- @include: @article-footer.snippet.md -->

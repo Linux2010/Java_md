@@ -5,13 +5,15 @@ tag:
   - Java新特性
 ---
 
-Java 18 在 2022 年 3 月 22 日正式发布，非长期支持版本。Java 18 带来了 9 个新特性：
+Java 18 在 2022 年 3 月 22 日正式发布，非长期支持版本。
+
+Java 18 带来了 9 个新特性：
 
 - [JEP 400:UTF-8 by Default（默认字符集为 UTF-8）](https://openjdk.java.net/jeps/400)
 - [JEP 408:Simple Web Server（简易的 Web 服务器）](https://openjdk.java.net/jeps/408)
 - [JEP 413:Code Snippets in Java API Documentation（Java API 文档中的代码片段）](https://openjdk.java.net/jeps/413)
 - [JEP 416:Reimplement Core Reflection with Method Handles（使用方法句柄重新实现反射核心）](https://openjdk.java.net/jeps/416)
-- [JEP 417:Vector（向量） API ](https://openjdk.java.net/jeps/417)（第三次孵化）
+- [JEP 417:Vector（向量） API](https://openjdk.java.net/jeps/417)（第三次孵化）
 - [JEP 418:Internet-Address Resolution（互联网地址解析）SPI](https://openjdk.java.net/jeps/418)
 - [JEP 419:Foreign Function & Memory API（外部函数和内存 API）](https://openjdk.java.net/jeps/419)（第二次孵化）
 - [JEP 420:Pattern Matching for switch（switch 模式匹配）](https://openjdk.java.net/jeps/420)（第二次预览）
@@ -78,7 +80,7 @@ Java 18 改进了 `java.lang.reflect.Method`、`Constructor` 的实现逻辑，�
 
 OpenJDK 官方给出了新老实现的反射性能基准测试结果。
 
-![新老实现的反射性能基准测试结果](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/java/new-features/JEP416Benchmark.png)
+![新老实现的反射性能基准测试结果](https://oss.javaguide.cn/github/javaguide/java/new-features/JEP416Benchmark.png)
 
 ## JEP 417: 向量 API（第三次孵化）
 
@@ -132,6 +134,8 @@ Java 18 定义了一个全新的 SPI（service-provider interface），用于主
 
 Java 程序可以通过该 API 与 Java 运行时之外的代码和数据进行互操作。通过高效地调用外部函数（即 JVM 之外的代码）和安全地访问外部内存（即不受 JVM 管理的内存），该 API 使 Java 程序能够调用本机库并处理本机数据，而不会像 JNI 那样危险和脆弱。
 
-外部函数和内存 API 在 Java 17 中进行了第一轮孵化，由 [JEP 412](https://openjdk.java.net/jeps/412) 提出。第二轮孵化由[ JEP 419](https://openjdk.org/jeps/419) 提出并集成到了 Java 18 中，预览由 [JEP 424](https://openjdk.org/jeps/424) 提出并集成到了 Java 19 中。
+外部函数和内存 API 在 Java 17 中进行了第一轮孵化，由 [JEP 412](https://openjdk.java.net/jeps/412) 提出。第二轮孵化由[JEP 419](https://openjdk.org/jeps/419) 提出并集成到了 Java 18 中，预览由 [JEP 424](https://openjdk.org/jeps/424) 提出并集成到了 Java 19 中。
 
-在  [Java 19 新特性概览](./java19.md) 中，我有详细介绍到外部函数和内存 API，这里就不再做额外的介绍了。
+在 [Java 19 新特性概览](./java19.md) 中，我有详细介绍到外部函数和内存 API，这里就不再做额外的介绍了。
+
+<!-- @include: @article-footer.snippet.md -->

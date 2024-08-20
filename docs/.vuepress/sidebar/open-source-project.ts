@@ -1,4 +1,6 @@
-export const openSourceProject = [
+import { arraySidebar } from "vuepress-theme-hope";
+
+export const openSourceProject = arraySidebar([
   {
     text: "技术教程",
     link: "tutorial",
@@ -12,7 +14,7 @@ export const openSourceProject = [
   {
     text: "系统设计",
     link: "system-design",
-    icon: "xitongsheji",
+    icon: "design",
   },
   {
     text: "工具类库",
@@ -34,4 +36,4 @@ export const openSourceProject = [
     link: "big-data",
     icon: "big-data",
   },
-];
+]);

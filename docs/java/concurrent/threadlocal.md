@@ -1,5 +1,5 @@
 ---
-title:  ThreadLocal 详解
+title: ThreadLocal 详解
 category: Java
 tag:
   - Java并发
@@ -24,7 +24,7 @@ tag:
 - `ThreadLocalMap.set()`方法实现原理？
 - `ThreadLocalMap.get()`方法实现原理？
 - 项目中`ThreadLocal`使用情况？遇到的坑？
-- ......
+- ……
 
 上述的一些问题你是否都已经掌握的很清楚了呢？本文将围绕这些问题使用图文方式来剖析`ThreadLocal`的**点点滴滴**。
 
@@ -96,7 +96,7 @@ size: 0
 - **弱引用**：使用 WeakReference 修饰的对象被称为弱引用，只要发生垃圾回收，若这个对象只被弱引用指向，那么就会被回收
 - **虚引用**：虚引用是最弱的引用，在 Java 中使用 PhantomReference 进行定义。虚引用中唯一的作用就是用队列接收对象即将死亡的通知
 
-接着再来看下代码，我们使用反射的方式来看看`GC`后`ThreadLocal`中的数据情况：(下面代码来源自：https://blog.csdn.net/thewindkee/article/details/103726942 本地运行演示 GC 回收场景)
+接着再来看下代码，我们使用反射的方式来看看`GC`后`ThreadLocal`中的数据情况：(下面代码来源自：<https://blog.csdn.net/thewindkee/article/details/103726942> 本地运行演示 GC 回收场景)
 
 ```java
 public class ThreadLocalDemo {
@@ -312,7 +312,7 @@ public class ThreadLocal<T> {
 
 从当前节点`staleSlot`向后查找`key`值相等的`Entry`元素，找到后更新`Entry`的值并交换`staleSlot`元素的位置(`staleSlot`位置为过期元素)，更新`Entry`数据，然后开始进行过期`Entry`的清理工作，如下图所示：
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/java-guide-blog/view.png)向后遍历过程中，如果没有找到相同 key 值的 Entry 数据：
+![](https://oss.javaguide.cn/java-guide-blog/view.png)向后遍历过程中，如果没有找到相同 key 值的 Entry 数据：
 
 ![](./images/thread-local/15.png)
 
@@ -392,13 +392,13 @@ private static int prevIndex(int i, int len) {
 1. 遍历当前`key`值对应的桶中`Entry`数据为空，这说明散列数组这里没有数据冲突，跳出`for`循环，直接`set`数据到对应的桶中
 2. 如果`key`值对应的桶中`Entry`数据不为空  
    2.1 如果`k = key`，说明当前`set`操作是一个替换操作，做替换逻辑，直接返回  
-   2.2 如果`key = null`，说明当前桶位置的`Entry`是过期数据，执行`replaceStaleEntry()`方法(核心方法)，然后返回  
+   2.2 如果`key = null`，说明当前桶位置的`Entry`是过期数据，执行`replaceStaleEntry()`方法(核心方法)，然后返回
 3. `for`循环执行完毕，继续往下执行说明向后迭代的过程中遇到了`entry`为`null`的情况  
    3.1 在`Entry`为`null`的桶中创建一个新的`Entry`对象  
-   3.2 执行`++size`操作  
+   3.2 执行`++size`操作
 4. 调用`cleanSomeSlots()`做一次启发式清理工作，清理散列数组中`Entry`的`key`过期的数据  
    4.1 如果清理工作完成后，未清理到任何数据，且`size`超过了阈值(数组长度的 2/3)，进行`rehash()`操作  
-   4.2 `rehash()`中会先进行一轮探测式清理，清理过期`key`，清理完成后如果**size >= threshold - threshold / 4**，就会执行真正的扩容逻辑(扩容逻辑往后看)  
+   4.2 `rehash()`中会先进行一轮探测式清理，清理过期`key`，清理完成后如果**size >= threshold - threshold / 4**，就会执行真正的扩容逻辑(扩容逻辑往后看)
 
 接着重点看下`replaceStaleEntry()`方法，`replaceStaleEntry()`方法提供替换过期数据的功能，我们可以对应上面**第四种情况**的原理图来再回顾下，具体代码如下：
 
@@ -692,7 +692,7 @@ private void resize() {
 
 我们以`get(ThreadLocal1)`为例，通过`hash`计算后，正确的`slot`位置应该是 4，而`index=4`的槽位已经有了数据，且`key`值不等于`ThreadLocal1`，所以需要继续往后迭代查找。
 
-迭代到`index=5`的数据时，此时`Entry.key=null`，触发一次探测式数据回收操作，执行`expungeStaleEntry()`方法，执行完后，`index 5,8`的数据都会被回收，而`index 6,7`的数据都会前移。`index 6,7`前移之后，继续从 `index=5` 往后迭代，于是就在 `index=5` 找到了`key`值相等的`Entry`数据，如下图所示：
+迭代到`index=5`的数据时，此时`Entry.key=null`，触发一次探测式数据回收操作，执行`expungeStaleEntry()`方法，执行完后，`index 5,8`的数据都会被回收，而`index 6,7`的数据都会前移。`index 6,7`前移之后，继续从 `index=5` 往后迭代，于是就在 `index=6` 找到了`key`值相等的`Entry`数据，如下图所示：
 
 ![](./images/thread-local/28.png)
 
@@ -730,7 +730,7 @@ private Entry getEntryAfterMiss(ThreadLocal<?> key, int i, Entry e) {
 
 ### `ThreadLocalMap`过期 key 的启发式清理流程
 
-上面多次提及到`ThreadLocalMap`过期key的两种清理方式：**探测式清理(expungeStaleEntry())**、**启发式清理(cleanSomeSlots())**
+上面多次提及到`ThreadLocalMap`过期 key 的两种清理方式：**探测式清理(expungeStaleEntry())**、**启发式清理(cleanSomeSlots())**
 
 探测式清理是以当前`Entry` 往后清理，遇到值为`null`则结束清理，属于**线性探测清理**。
 
@@ -910,3 +910,5 @@ public class MyThreadPoolTaskExecutor extends ThreadPoolTaskExecutor {
 #### 使用 MQ 发送消息给第三方系统
 
 在 MQ 发送的消息体中自定义属性`requestId`，接收方消费消息后，自己解析`requestId`使用即可。
+
+<!-- @include: @article-footer.snippet.md -->

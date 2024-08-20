@@ -1,5 +1,5 @@
 ---
-title:  单元测试到底是什么？应该怎么做？
+title: 单元测试到底是什么？应该怎么做？
 category: 代码质量
 ---
 
@@ -27,7 +27,7 @@ category: 代码质量
 
 每个开发者都会经历重构，重构后把代码改坏了的情况并不少见，很可能你只是修改了一个很简单的方法就导致系统出现了一个比较严重的错误。
 
-如果有了单元测试的话，就不会存在这个隐患了。写完一个类，把单元测试写了，确保这个类逻辑正确；写第二个类，单元测试.....写 100 个类，道理一样，每个类做到第一点“保证逻辑正确性”，100 个类拼在一起肯定不出问题。你大可以放心一边重构，一边运行 APP；而不是整体重构完，提心跳胆地 run。
+如果有了单元测试的话，就不会存在这个隐患了。写完一个类，把单元测试写了，确保这个类逻辑正确；写第二个类，单元测试……写 100 个类，道理一样，每个类做到第一点“保证逻辑正确性”，100 个类拼在一起肯定不出问题。你大可以放心一边重构，一边运行 APP；而不是整体重构完，提心吊胆地 run。
 
 ### 提高代码质量
 
@@ -41,7 +41,7 @@ category: 代码质量
 
 ### 快速定位 bug
 
-如果程序有 bug，我们运行一次全部单元测试，找到不通过的测试，可以很快地定位对应的执行代码。修复代码后，运行对应的单元测试；如还不通过，继续修改，运行测试.....直到**测试通过**。
+如果程序有 bug，我们运行一次全部单元测试，找到不通过的测试，可以很快地定位对应的执行代码。修复代码后，运行对应的单元测试；如还不通过，继续修改，运行测试……直到**测试通过**。
 
 ### 持续集成依赖单元测试
 
@@ -57,7 +57,7 @@ category: 代码质量
 
 ### 大牛都写单元测试
 
-国外很多家喻户晓的开源项目，都有大量单元测试。例如，[retrofit](https://link.jianshu.com?t=https://github.com/square/retrofit/tree/master/retrofit/src/test/java/retrofit2)、[okhttp](https://link.jianshu.com?t=https://github.com/square/okhttp/tree/master/okhttp-tests/src/test/java/okhttp3)、[butterknife](https://link.jianshu.com?t=https://github.com/JakeWharton/butterknife/tree/master/butterknife-compiler/src/test/java/butterknife).... 国外大牛都写单元测试，我们也写吧！
+国外很多家喻户晓的开源项目，都有大量单元测试。例如，[retrofit](https://link.jianshu.com?t=https://github.com/square/retrofit/tree/master/retrofit/src/test/java/retrofit2)、[okhttp](https://link.jianshu.com?t=https://github.com/square/okhttp/tree/master/okhttp-tests/src/test/java/okhttp3)、[butterknife](https://link.jianshu.com?t=https://github.com/JakeWharton/butterknife/tree/master/butterknife-compiler/src/test/java/butterknife)…… 国外大牛都写单元测试，我们也写吧！
 
 很多读者都有这种想法，一开始满腔热血。当真要对自己项目单元测试时，便困难重重，很大原因是项目对单元测试不友好。最后只能对一些不痛不痒的工具类做单元测试，久而久之，当初美好愿望也不了了之。
 
@@ -67,7 +67,7 @@ category: 代码质量
 
 ### 心虚
 
-笔者也是个不太相信自己代码的人，总觉得哪里会突然冒出莫名其妙的 bug，也怕别人不小心改了自己的代码（被害妄想症），新版本上线提心跳胆......花点时间写单元测试，有事没事跑一下测试，确保原逻辑没问题，至少能睡安稳一点。
+笔者也是个不太相信自己代码的人，总觉得哪里会突然冒出莫名其妙的 bug，也怕别人不小心改了自己的代码（被害妄想症），新版本上线提心吊胆……花点时间写单元测试，有事没事跑一下测试，确保原逻辑没问题，至少能睡安稳一点。
 
 ## TDD 测试驱动开发
 
@@ -89,21 +89,35 @@ TDD 在很多人眼中是不实用的，一来他们并不理解测试“驱动�
 
 测试驱动开发有好处也有坏处。因为每个测试用例都是根据需求来的，或者说把一个大需求分解成若干小需求编写测试用例，所以测试用例写出来后，开发者写的执行代码，必须满足测试用例。如果测试不通过，则修改执行代码，直到测试用例通过。
 
-**优点** ：
+**优点**：
 
 1. 帮你整理需求，梳理思路；
 2. 帮你设计出更合理的接口（空想的话很容易设计出屎）；
 3. 减小代码出现 bug 的概率；
 4. 提高开发效率（前提是正确且熟练使用 TDD）。
 
-**缺点** ：
+**缺点**：
 
 1. 能用好 TDD 的人非常少，看似简单，实则门槛很高；
 2. 投入开发资源（时间和精力）通常会更多；
 3. 由于测试用例在未进行代码设计前写；很有可能限制开发者对代码整体设计；
 4. 可能引起开发人员不满情绪，我觉得这点很严重，毕竟不是人人都喜欢单元测试，尽管单元测试会带给我们相当多的好处。
 
-相关阅读：[如何用正确的姿势打开 TDD？ - 陈天 - 2017](https://zhuanlan.zhihu.com/p/24997923)  。
+相关阅读：[如何用正确的姿势打开 TDD？ - 陈天 - 2017](https://zhuanlan.zhihu.com/p/24997923) 。
+
+## 单测框架如何选择？
+
+对于单测来说，目前常用的单测框架有：JUnit、Mockito、Spock、PowerMock、JMockit、TestableMock 等等。
+
+JUnit 几乎是默认选择，但是其不支持 Mock，因此我们还需要选择一个 Mock 工具。Mockito 和 Spock 是最主流的两款 Mock 工具，一般都是在这两者中选择。
+
+究竟是选择 Mockito 还是 Spock 呢？我这里做了一些简单的对比分析：
+
+- Spock 没办法 Mock 静态方法和私有方法 ，Mockito 3.4.0 以后，支持静态方法的 Mock，具体可以看这个 issue：<https://github.com/mockito/mockito/issues/1013>，具体教程可以看这篇文章：<https://www.baeldung.com/mockito-mock-static-methods。>
+- Spock 基于 Groovy，写出来的测试代码更清晰易读，比较规范(自带 given-when-then 的常用测试结构规范)。Mockito 没有具体的结构规范，需要项目组自己约定一个或者遵守比较好的测试代码实践。通常来说，同样的测试用例，Spock 的代码要更简洁。
+- Mockito 使用的人群更广泛，稳定可靠。并且，Mockito 是 SpringBoot Test 默认集成的 Mock 工具。
+
+Mockito 和 Spock 都是非常不错的 Mock 工具，相对来说，Mockito 的适用性更强一些。
 
 ## 总结
 
@@ -120,3 +134,5 @@ TDD 在很多人眼中是不实用的，一来他们并不理解测试“驱动�
 作为一名经验丰富的程序员，写单元测试更多的是**对自己的代码负责**。有测试用例的代码，别人更容易看懂，以后别人接手你的代码时，也可能放心做改动。
 
 **多敲代码实践，多跟有单元测试经验的工程师交流**，你会发现写单元测试获得的收益会更多。
+
+<!-- @include: @article-footer.snippet.md -->

@@ -5,7 +5,7 @@ tag:
   - Java新特性
 ---
 
-JDK 19 定于 9 月 20 日正式发布以供生产使用，非长期支持版本。不过，JDK 19 中有一些比较重要的新特性值得关注。
+JDK 19 定于 2022 年 9 月 20 日正式发布以供生产使用，非长期支持版本。不过，JDK 19 中有一些比较重要的新特性值得关注。
 
 JDK 19 只有 7 个新特性：
 
@@ -25,7 +25,7 @@ JDK 19 只有 7 个新特性：
 
 Java 程序可以通过该 API 与 Java 运行时之外的代码和数据进行互操作。通过高效地调用外部函数（即 JVM 之外的代码）和安全地访问外部内存（即不受 JVM 管理的内存），该 API 使 Java 程序能够调用本机库并处理本机数据，而不会像 JNI 那样危险和脆弱。
 
-外部函数和内存 API 在 Java 17 中进行了第一轮孵化，由 [JEP 412](https://openjdk.java.net/jeps/412) 提出。第二轮孵化由[ JEP 419](https://openjdk.org/jeps/419) 提出并集成到了 Java 18 中，预览由 [JEP 424](https://openjdk.org/jeps/424) 提出并集成到了 Java 19 中。
+外部函数和内存 API 在 Java 17 中进行了第一轮孵化，由 [JEP 412](https://openjdk.java.net/jeps/412) 提出。第二轮孵化由[JEP 419](https://openjdk.org/jeps/419) 提出并集成到了 Java 18 中，预览由 [JEP 424](https://openjdk.org/jeps/424) 提出并集成到了 Java 19 中。
 
 在没有外部函数和内存 API 之前：
 
@@ -36,8 +36,8 @@ Java 程序可以通过该 API 与 Java 运行时之外的代码和数据进行�
 
 Foreign Function & Memory API (FFM API) 定义了类和接口：
 
-- 分配外部内存 ：`MemorySegment`、、`MemoryAddress`和`SegmentAllocator`）；
-- 操作和访问结构化的外部内存： `MemoryLayout`, `VarHandle`；
+- 分配外部内存：`MemorySegment`、、`MemoryAddress`和`SegmentAllocator`）；
+- 操作和访问结构化的外部内存：`MemoryLayout`, `VarHandle`；
 - 控制外部内存的分配和释放：`MemorySession`；
 - 调用外部函数：`Linker`、`FunctionDescriptor`和`SymbolLookup`。
 
@@ -78,9 +78,13 @@ assert Arrays.equals(javaStrings, new String[] {"car", "cat", "dog", "mouse"}); 
 
 虚拟线程避免了上下文切换的额外耗费，兼顾了多线程的优点，简化了高并发程序的复杂，可以有效减少编写、维护和观察高吞吐量并发应用程序的工作量。
 
-知乎有一个关于 Java 19 虚拟线程的讨论，感兴趣的可以去看看：https://www.zhihu.com/question/536743167 。
+知乎有一个关于 Java 19 虚拟线程的讨论，感兴趣的可以去看看：<https://www.zhihu.com/question/536743167> 。
 
-Java 虚拟线程的详细解读可以看这篇文章：[Java19 正式 GA！看虚拟线程如何大幅提高系统吞吐量](https://mp.weixin.qq.com/s/yyApBXxpXxVwttr01Hld6Q)。
+Java 虚拟线程的详细解读和原理可以看下面这两篇文章：
+
+- [虚拟线程原理及性能分析｜得物技术](https://mp.weixin.qq.com/s/vdLXhZdWyxc6K-D3Aj03LA)
+- [Java19 正式 GA！看虚拟线程如何大幅提高系统吞吐量](https://mp.weixin.qq.com/s/yyApBXxpXxVwttr01Hld6Q)
+- [虚拟线程 - VirtualThread 源码透视](https://www.cnblogs.com/throwable/p/16758997.html)
 
 ## JEP 426: 向量 API（第四次孵化）
 
@@ -111,3 +115,5 @@ JDK 19 引入了结构化并发，一种多线程编程方法，目的是为了�
 ```
 
 结构化并发非常适合虚拟线程，虚拟线程是 JDK 实现的轻量级线程。许多虚拟线程共享同一个操作系统线程，从而允许非常多的虚拟线程。
+
+<!-- @include: @article-footer.snippet.md -->

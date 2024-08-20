@@ -1,4 +1,9 @@
-# Java8 新特性实战
+---
+title: Java8 新特性实战
+category: Java
+tag:
+  - Java新特性
+---
 
 > 本文来自[cowbi](https://github.com/cowbi)的投稿~
 
@@ -142,8 +147,8 @@ public int compare(Integer o1, Integer o2) {
 //Lambda
 Collections.sort(strings, (Integer o1, Integer o2) -> o1 - o2);
 //分解开
-Comparator<Integer> comperator = (Integer o1, Integer o2) -> o1 - o2;
-Collections.sort(strings, comperator);
+Comparator<Integer> comparator = (Integer o1, Integer o2) -> o1 - o2;
+Collections.sort(strings, comparator);
 ```
 
 **3.`Listener` 接口**
@@ -204,7 +209,7 @@ void lamndaFor() {
         strings.forEach((s) -> System.out.println(s));
         //or
         strings.forEach(System.out::println);
- 				//map
+     //map
         Map<Integer, String> map = new HashMap<>();
         map.forEach((k,v)->System.out.println(v));
 }
@@ -602,60 +607,89 @@ public static <T> T requireNonNull(T obj) {
 
 `ofNullable` 方法和`of`方法唯一区别就是当 value 为 null 时，`ofNullable` 返回的是`EMPTY`，of 会抛出 `NullPointerException` 异常。如果需要把 `NullPointerException` 暴漏出来就用 `of`，否则就用 `ofNullable`。
 
-### `map()`相关方法。
-
-```java
-/**
-* 如果value为null，返回EMPTY，否则返回Optional封装的参数值
-*/
-public<U> Optional<U> map(Function<? super T, ? extends U> mapper) {
-        Objects.requireNonNull(mapper);
-        if (!isPresent())
-            return empty();
-        else {
-            return Optional.ofNullable(mapper.apply(value));
-        }
-}
-/**
-* 如果value为null，返回EMPTY，否则返回Optional封装的参数值，如果参数值返回null会抛 NullPointerException
-*/
-public<U> Optional<U> flatMap(Function<? super T, Optional<U>> mapper) {
-        Objects.requireNonNull(mapper);
-        if (!isPresent())
-            return empty();
-        else {
-            return Objects.requireNonNull(mapper.apply(value));
-        }
-}
-```
-
 **`map()` 和 `flatMap()` 有什么区别的？**
 
-**1.参数不一样，`map` 的参数上面看到过，`flatMap` 的参数是这样**
+`map` 和 `flatMap` 都是将一个函数应用于集合中的每个元素，但不同的是`map`返回一个新的集合，`flatMap`是将每个元素都映射为一个集合，最后再将这个集合展平。
+
+在实际应用场景中，如果`map`返回的是数组，那么最后得到的是一个二维数组，使用`flatMap`就是为了将这个二维数组展平变成一个一维数组。
 
 ```java
-class ZooFlat {
-        private DogFlat dog = new DogFlat();
+public class MapAndFlatMapExample {
+    public static void main(String[] args) {
+        List<String[]> listOfArrays = Arrays.asList(
+                new String[]{"apple", "banana", "cherry"},
+                new String[]{"orange", "grape", "pear"},
+                new String[]{"kiwi", "melon", "pineapple"}
+        );
 
-        public DogFlat getDog() {
-            return dog;
-        }
+        List<String[]> mapResult = listOfArrays.stream()
+                .map(array -> Arrays.stream(array).map(String::toUpperCase).toArray(String[]::new))
+                .collect(Collectors.toList());
+
+        System.out.println("Using map:");
+        mapResult.forEach(arrays-> System.out.println(Arrays.toString(arrays)));
+
+        List<String> flatMapResult = listOfArrays.stream()
+                .flatMap(array -> Arrays.stream(array).map(String::toUpperCase))
+                .collect(Collectors.toList());
+
+        System.out.println("Using flatMap:");
+        System.out.println(flatMapResult);
     }
-
-class DogFlat {
-        private int age = 1;
-        public Optional<Integer> getAge() {
-            return Optional.ofNullable(age);
-        }
 }
 
-ZooFlat zooFlat = new ZooFlat();
-Optional.ofNullable(zooFlat).map(o -> o.getDog()).flatMap(d -> d.getAge()).ifPresent(age ->
-    System.out.println(age)
-);
 ```
 
-**2.`flatMap()` 参数返回值如果是 null 会抛 `NullPointerException`，而 `map()` 返回`EMPTY`。**
+运行结果:
+
+```plain
+Using map:
+[[APPLE, BANANA, CHERRY], [ORANGE, GRAPE, PEAR], [KIWI, MELON, PINEAPPLE]]
+
+Using flatMap:
+[APPLE, BANANA, CHERRY, ORANGE, GRAPE, PEAR, KIWI, MELON, PINEAPPLE]
+```
+
+最简单的理解就是`flatMap()`可以将`map()`的结果展开。
+
+在`Optional`里面，当使用`map()`时，如果映射函数返回的是一个普通值，它会将这个值包装在一个新的`Optional`中。而使用`flatMap`时，如果映射函数返回的是一个`Optional`，它会将这个返回的`Optional`展平，不再包装成嵌套的`Optional`。
+
+下面是一个对比的示例代码：
+
+```java
+public static void main(String[] args) {
+        int userId = 1;
+
+        // 使用flatMap的代码
+        String cityUsingFlatMap = getUserById(userId)
+                .flatMap(OptionalExample::getAddressByUser)
+                .map(Address::getCity)
+                .orElse("Unknown");
+
+        System.out.println("User's city using flatMap: " + cityUsingFlatMap);
+
+        // 不使用flatMap的代码
+        Optional<Optional<Address>> optionalAddress = getUserById(userId)
+                .map(OptionalExample::getAddressByUser);
+
+        String cityWithoutFlatMap;
+        if (optionalAddress.isPresent()) {
+            Optional<Address> addressOptional = optionalAddress.get();
+            if (addressOptional.isPresent()) {
+                Address address = addressOptional.get();
+                cityWithoutFlatMap = address.getCity();
+            } else {
+                cityWithoutFlatMap = "Unknown";
+            }
+        } else {
+            cityWithoutFlatMap = "Unknown";
+        }
+
+        System.out.println("User's city without flatMap: " + cityWithoutFlatMap);
+    }
+```
+
+在`Stream`和`Optional`中正确使用`flatMap`可以减少很多不必要的代码。
 
 ### 判断 value 是否为 null
 
@@ -733,7 +767,7 @@ public Optional<T> filter(Predicate<? super T> predicate) {
 
 ### 小结
 
-看完 `Optional` 源码，`Optional` 的方法真的非常简单，值得注意的是如果坚决不想看见 `NPE`，就不要用 `of() `、 `get()` 、`flatMap(..)`。最后再综合用一下 `Optional` 的高频方法。
+看完 `Optional` 源码，`Optional` 的方法真的非常简单，值得注意的是如果坚决不想看见 `NPE`，就不要用 `of()`、 `get()`、`flatMap(..)`。最后再综合用一下 `Optional` 的高频方法。
 
 ```java
 Optional.ofNullable(zoo).map(o -> o.getDog()).map(d -> d.getAge()).filter(v->v==1).orElse(3);
@@ -752,7 +786,7 @@ Optional.ofNullable(zoo).map(o -> o.getDog()).map(d -> d.getAge()).filter(v->v==
 
 ### java.time 主要类
 
-`java.util.Date` 既包含日期又包含时间，而  `java.time` 把它们进行了分离
+`java.util.Date` 既包含日期又包含时间，而 `java.time` 把它们进行了分离
 
 ```java
 LocalDateTime.class //日期+时间 format: yyyy-MM-ddTHH:mm:ss.SSS
@@ -766,8 +800,8 @@ LocalTime.class //时间 format: HH:mm:ss
 
 ```java
 public void oldFormat(){
-		Date now = new Date();
-    //format yyyy-MM-dd HH:mm:ss
+    Date now = new Date();
+    //format yyyy-MM-dd
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     String date  = sdf.format(now);
     System.out.println(String.format("date format : %s", date));
@@ -829,7 +863,7 @@ LocalTime time = LocalTime.of(12, 12, 22);
 LocalTime.parse("12:12:22");
 ```
 
-**Java 8 之前** 转换都需要借助 `SimpleDateFormat` 类，而**Java 8 之后**只需要 `LocalDate`、`LocalTime`、`LocalDateTime`的  `of` 或 `parse` 方法。
+**Java 8 之前** 转换都需要借助 `SimpleDateFormat` 类，而**Java 8 之后**只需要 `LocalDate`、`LocalTime`、`LocalDateTime`的 `of` 或 `parse` 方法。
 
 ### 日期计算
 
@@ -879,7 +913,7 @@ public void pushWeek(){
                 + period.getYears() + "年"
                 + period.getMonths() + "月"
                 + period.getDays() + "天");
-		 //打印结果是 “date1 到 date2 相隔：0年9月27天”
+   //打印结果是 “date1 到 date2 相隔：0年9月27天”
      //这里period.getDays()得到的天是抛去年月以外的天数，并不是总天数
      //如果要获取纯粹的总天数应该用下面的方法
      long day = date2.toEpochDay() - date1.toEpochDay();
@@ -976,7 +1010,7 @@ System.out.println(date);
 //Wed Jan 27 14:05:29 CST 2021
 ```
 
-在新特性中引入了  `java.time.ZonedDateTime ` 来表示带时区的时间。它可以看成是 `LocalDateTime + ZoneId`。
+在新特性中引入了 `java.time.ZonedDateTime` 来表示带时区的时间。它可以看成是 `LocalDateTime + ZoneId`。
 
 ```java
 //当前时区时间
@@ -1018,3 +1052,5 @@ System.out.println("本地时区时间: " + localZoned);
 - Date time-api
 
 这些都是开发当中比较常用的特性。梳理下来发现它们真香，而我却没有更早的应用。总觉得学习 java 8 新特性比较麻烦，一直使用老的实现方式。其实这些新特性几天就可以掌握，一但掌握，效率会有很大的提高。其实我们涨工资也是涨的学习的钱，不学习终究会被淘汰，35 岁危机会提前来临。
+
+<!-- @include: @article-footer.snippet.md -->

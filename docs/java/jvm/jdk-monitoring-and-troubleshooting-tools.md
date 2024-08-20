@@ -1,27 +1,26 @@
 ---
+title: JDK监控和故障处理工具总结
 category: Java
 tag:
   - JVM
 ---
-
-# JDK 监控和故障处理工具总结
 
 ## JDK 命令行工具
 
 这些命令在 JDK 安装目录下的 bin 目录下：
 
 - **`jps`** (JVM Process Status）: 类似 UNIX 的 `ps` 命令。用于查看所有 Java 进程的启动类、传入参数和 Java 虚拟机参数等信息；
-- **`jstat`**（JVM Statistics Monitoring Tool）:  用于收集 HotSpot 虚拟机各方面的运行数据;
+- **`jstat`**（JVM Statistics Monitoring Tool）: 用于收集 HotSpot 虚拟机各方面的运行数据;
 - **`jinfo`** (Configuration Info for Java) : Configuration Info for Java,显示虚拟机配置信息;
 - **`jmap`** (Memory Map for Java) : 生成堆转储快照;
-- **`jhat`** (JVM Heap Dump Browser) : 用于分析 heapdump 文件，它会建立一个 HTTP/HTML 服务器，让用户可以在浏览器上查看分析结果;
+- **`jhat`** (JVM Heap Dump Browser) : 用于分析 heapdump 文件，它会建立一个 HTTP/HTML 服务器，让用户可以在浏览器上查看分析结果。JDK9 移除了 jhat；
 - **`jstack`** (Stack Trace for Java) : 生成虚拟机当前时刻的线程快照，线程快照就是当前虚拟机内每一条线程正在执行的方法堆栈的集合。
 
 ### `jps`:查看所有 Java 进程
 
 `jps`(JVM Process Status) 命令类似 UNIX 的 `ps` 命令。
 
-`jps`：显示虚拟机执行主类名称以及这些进程的本地虚拟机唯一 ID（Local Virtual Machine Identifier,LVMID）。`jps -q` ：只输出进程的本地虚拟机唯一 ID。
+`jps`：显示虚拟机执行主类名称以及这些进程的本地虚拟机唯一 ID（Local Virtual Machine Identifier,LVMID）。`jps -q`：只输出进程的本地虚拟机唯一 ID。
 
 ```powershell
 C:\Users\SnailClimb>jps
@@ -61,16 +60,16 @@ jstat -<option> [-t] [-h<lines>] <vmid> [<interval> [<count>]]
 
 **常见的 option 如下：**
 
-- `jstat -class vmid` ：显示 ClassLoader 的相关信息；
-- `jstat -compiler vmid` ：显示 JIT 编译的相关信息；
-- `jstat -gc vmid` ：显示与 GC 相关的堆信息；
-- `jstat -gccapacity vmid` ：显示各个代的容量及使用情况；
-- `jstat -gcnew vmid` ：显示新生代信息；
-- `jstat -gcnewcapcacity vmid` ：显示新生代大小与使用情况；
-- `jstat -gcold vmid` ：显示老年代和永久代的行为统计，从jdk1.8开始,该选项仅表示老年代，因为永久代被移除了；
-- `jstat -gcoldcapacity vmid` ：显示老年代的大小；
-- `jstat -gcpermcapacity vmid` ：显示永久代大小，从jdk1.8开始,该选项不存在了，因为永久代被移除了；
-- `jstat -gcutil vmid` ：显示垃圾收集信息；
+- `jstat -class vmid`：显示 ClassLoader 的相关信息；
+- `jstat -compiler vmid`：显示 JIT 编译的相关信息；
+- `jstat -gc vmid`：显示与 GC 相关的堆信息；
+- `jstat -gccapacity vmid`：显示各个代的容量及使用情况；
+- `jstat -gcnew vmid`：显示新生代信息；
+- `jstat -gcnewcapcacity vmid`：显示新生代大小与使用情况；
+- `jstat -gcold vmid`：显示老年代和永久代的行为统计，从 jdk1.8 开始,该选项仅表示老年代，因为永久代被移除了；
+- `jstat -gcoldcapacity vmid`：显示老年代的大小；
+- `jstat -gcpermcapacity vmid`：显示永久代大小，从 jdk1.8 开始,该选项不存在了，因为永久代被移除了；
+- `jstat -gcutil vmid`：显示垃圾收集信息；
 
 另外，加上 `-t`参数可以在输出信息上加一个 Timestamp 列，显示程序的运行时间。
 
@@ -117,7 +116,7 @@ Heap dump file created
 
 ### **`jhat`**: 分析 heapdump 文件
 
- **`jhat`** 用于分析 heapdump 文件，它会建立一个 HTTP/HTML 服务器，让用户可以在浏览器上查看分析结果。
+**`jhat`** 用于分析 heapdump 文件，它会建立一个 HTTP/HTML 服务器，让用户可以在浏览器上查看分析结果。
 
 ```powershell
 C:\Users\SnailClimb>jhat C:\Users\SnailClimb\Desktop\heap.hprof
@@ -133,6 +132,8 @@ Server is ready.
 ```
 
 访问 <http://localhost:7000/>
+
+注意⚠️：JDK9 移除了 jhat（[JEP 241: Remove the jhat Tool](https://openjdk.org/jeps/241)），你可以使用其替代品 Eclipse Memory Analyzer Tool (MAT) 和 VisualVM，这也是官方所推荐的。
 
 ### **`jstack`** :生成虚拟机当前时刻的线程快照
 
@@ -183,14 +184,14 @@ public class DeadLockDemo {
 
 Output
 
-```
+```plain
 Thread[线程 1,5,main]get resource1
 Thread[线程 2,5,main]get resource2
 Thread[线程 1,5,main]waiting get resource2
 Thread[线程 2,5,main]waiting get resource1
 ```
 
-线程 A 通过 synchronized (resource1) 获得 resource1 的监视器锁，然后通过` Thread.sleep(1000);`让线程 A 休眠 1s 为的是让线程 B 得到执行然后获取到 resource2 的监视器锁。线程 A 和线程 B 休眠结束了都开始企图请求获取对方的资源，然后这两个线程就会陷入互相等待的状态，这也就产生了死锁。
+线程 A 通过 synchronized (resource1) 获得 resource1 的监视器锁，然后通过`Thread.sleep(1000);`让线程 A 休眠 1s 为的是让线程 B 得到执行然后获取到 resource2 的监视器锁。线程 A 和线程 B 休眠结束了都开始企图请求获取对方的资源，然后这两个线程就会陷入互相等待的状态，这也就产生了死锁。
 
 **通过 `jstack` 命令分析：**
 
@@ -244,7 +245,7 @@ Found 1 deadlock.
 
 ### JConsole:Java 监视与管理控制台
 
-JConsole 是基于 JMX 的可视化监视、管理工具。可以很方便的监视本地及远程服务器的 java 进程的内存使用情况。你可以在控制台输出`console`命令启动或者在 JDK 目录下的 bin 目录找到`jconsole.exe`然后双击启动。
+JConsole 是基于 JMX 的可视化监视、管理工具。可以很方便的监视本地及远程服务器的 java 进程的内存使用情况。你可以在控制台输入`jconsole`命令启动或者在 JDK 目录下的 bin 目录找到`jconsole.exe`然后双击启动。
 
 #### 连接 Jconsole
 
@@ -253,7 +254,7 @@ JConsole 是基于 JMX 的可视化监视、管理工具。可以很方便的监
 如果需要使用 JConsole 连接远程进程，可以在远程 Java 程序启动时加上下面这些参数:
 
 ```properties
--Djava.rmi.server.hostname=外网访问 ip 地址 
+-Djava.rmi.server.hostname=外网访问 ip 地址
 -Dcom.sun.management.jmxremote.port=60001   //监控的端口号
 -Dcom.sun.management.jmxremote.authenticate=false   //关闭认证
 -Dcom.sun.management.jmxremote.ssl=false
@@ -261,8 +262,8 @@ JConsole 是基于 JMX 的可视化监视、管理工具。可以很方便的监
 
 在使用 JConsole 连接时，远程进程地址如下：
 
-```
-外网访问 ip 地址:60001 
+```plain
+外网访问 ip 地址:60001
 ```
 
 #### 查看 Java 程序概况
@@ -290,22 +291,35 @@ JConsole 可以显示当前内存的详细信息。不仅包括堆内存/非堆�
 
 ### Visual VM:多合一故障处理工具
 
-VisualVM 提供在 Java 虚拟机 (Java Virutal Machine, JVM) 上运行的 Java 应用程序的详细信息。在 VisualVM 的图形用户界面中，您可以方便、快捷地查看多个 Java 应用程序的相关信息。Visual VM 官网：<https://visualvm.github.io/> 。Visual VM 中文文档:<https://visualvm.github.io/documentation.html>。
+VisualVM 提供在 Java 虚拟机 (Java Virtual Machine, JVM) 上运行的 Java 应用程序的详细信息。在 VisualVM 的图形用户界面中，您可以方便、快捷地查看多个 Java 应用程序的相关信息。Visual VM 官网：<https://visualvm.github.io/> 。Visual VM 中文文档:<https://visualvm.github.io/documentation.html>。
 
 下面这段话摘自《深入理解 Java 虚拟机》。
 
 > VisualVM（All-in-One Java Troubleshooting Tool）是到目前为止随 JDK 发布的功能最强大的运行监视和故障处理程序，官方在 VisualVM 的软件说明中写上了“All-in-One”的描述字样，预示着他除了运行监视、故障处理外，还提供了很多其他方面的功能，如性能分析（Profiling）。VisualVM 的性能分析功能甚至比起 JProfiler、YourKit 等专业且收费的 Profiling 工具都不会逊色多少，而且 VisualVM 还有一个很大的优点：不需要被监视的程序基于特殊 Agent 运行，因此他对应用程序的实际性能的影响很小，使得他可以直接应用在生产环境中。这个优点是 JProfiler、YourKit 等工具无法与之媲美的。
 
- VisualVM 基于 NetBeans 平台开发，因此他一开始就具备了插件扩展功能的特性，通过插件扩展支持，VisualVM 可以做到：
+VisualVM 基于 NetBeans 平台开发，因此他一开始就具备了插件扩展功能的特性，通过插件扩展支持，VisualVM 可以做到：
 
-- **显示虚拟机进程以及进程的配置、环境信息（jps、jinfo）。**
-- **监视应用程序的 CPU、GC、堆、方法区以及线程的信息（jstat、jstack）。**
-- **dump 以及分析堆转储快照（jmap、jhat）。**
-- **方法级的程序运行性能分析，找到被调用最多、运行时间最长的方法。**
-- **离线程序快照：收集程序的运行时配置、线程 dump、内存 dump 等信息建立一个快照，可以将快照发送开发者处进行 Bug 反馈。**
-- **其他 plugins 的无限的可能性......**
+- 显示虚拟机进程以及进程的配置、环境信息（jps、jinfo）。
+- 监视应用程序的 CPU、GC、堆、方法区以及线程的信息（jstat、jstack）。
+- dump 以及分析堆转储快照（jmap、jhat）。
+- 方法级的程序运行性能分析，找到被调用最多、运行时间最长的方法。
+- 离线程序快照：收集程序的运行时配置、线程 dump、内存 dump 等信息建立一个快照，可以将快照发送开发者处进行 Bug 反馈。
+- 其他 plugins 的无限的可能性……
 
 这里就不具体介绍 VisualVM 的使用，如果想了解的话可以看:
 
 - <https://visualvm.github.io/documentation.html>
 - <https://www.ibm.com/developerworks/cn/java/j-lo-visualvm/index.html>
+
+### MAT：内存分析器工具
+
+MAT（Memory Analyzer Tool）是一款快速便捷且功能强大丰富的 JVM 堆内存离线分析工具。其通过展现 JVM 异常时所记录的运行时堆转储快照（Heap dump）状态（正常运行时也可以做堆转储分析），帮助定位内存泄漏问题或优化大内存消耗逻辑。
+
+在遇到 OOM 和 GC 问题的时候，我一般会首选使用 MAT 分析 dump 文件在，这也是该工具应用最多的一个场景。
+
+关于 MAT 的详细介绍推荐下面这两篇文章，写的很不错：
+
+- [JVM 内存分析工具 MAT 的深度讲解与实践—入门篇](https://juejin.cn/post/6908665391136899079)
+- [JVM 内存分析工具 MAT 的深度讲解与实践—进阶篇](https://juejin.cn/post/6911624328472133646)
+
+<!-- @include: @article-footer.snippet.md -->

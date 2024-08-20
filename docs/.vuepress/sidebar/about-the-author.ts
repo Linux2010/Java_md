@@ -1,8 +1,10 @@
-export const aboutTheAuthor = [
+import { arraySidebar } from "vuepress-theme-hope";
+
+export const aboutTheAuthor = arraySidebar([
   {
     text: "个人经历",
-    icon: "zuozhe",
-    collapsable: false,
+    icon: "experience",
+    collapsible: false,
     children: [
       "internet-addiction-teenager",
       "my-college-life",
@@ -14,11 +16,12 @@ export const aboutTheAuthor = [
   {
     text: "杂谈",
     icon: "chat",
-    collapsable: false,
+    collapsible: false,
     children: [
+      "writing-technology-blog-six-years",
       "my-article-was-stolen-and-made-into-video-and-it-became-popular",
       "dog-that-copies-other-people-essay",
       "zhishixingqiu-two-years",
     ],
   },
-];
+]);

@@ -5,7 +5,7 @@ tag:
   - 安全
 ---
 
-> 本文授权转载自 ： https://ken.io/note/sso-design-implement 作者：ken.io
+> 本文授权转载自：<https://ken.io/note/sso-design-implement> 作者：ken.io
 
 ## SSO 介绍
 
@@ -13,7 +13,7 @@ tag:
 
 SSO 英文全称 Single Sign On，单点登录。SSO 是在多个应用系统中，用户只需要登录一次就可以访问所有相互信任的应用系统。
 
-例如你登录网易账号中心（https://reg.163.com/ ）之后访问以下站点都是登录状态。
+例如你登录网易账号中心（<https://reg.163.com/> ）之后访问以下站点都是登录状态。
 
 - 网易直播 [https://v.163.com](https://v.163.com/)
 - 网易博客 [https://blog.163.com](https://blog.163.com/)
@@ -40,7 +40,7 @@ SSO 英文全称 Single Sign On，单点登录。SSO 是在多个应用系统中
 
 ### 核心应用与依赖
 
-![单点登录（SSO）设计](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/security/sso/sso-system.png-kblb.png)
+![单点登录（SSO）设计](https://oss.javaguide.cn/github/javaguide/system-design/security/sso/sso-system.png-kblb.png)
 
 | 应用/模块/对象    | 说明                                |
 | ----------------- | ----------------------------------- |
@@ -63,16 +63,16 @@ SSO 英文全称 Single Sign On，单点登录。SSO 是在多个应用系统中
 
 对于登录信息的存储，建议采用 Redis，使用 Redis 集群来存储登录信息，既可以保证高可用，又可以线性扩充。同时也可以让 SSO 服务满足负载均衡/可伸缩的需求。
 
-| 对象      | 说明                                                         |
-| --------- | ------------------------------------------------------------ |
+| 对象      | 说明                                                                                                               |
+| --------- | ------------------------------------------------------------------------------------------------------------------ |
 | AuthToken | 直接使用 UUID/GUID 即可，如果有验证 AuthToken 合法性需求，可以将 UserName+时间戳加密生成，服务端解密之后验证合法性 |
-| 登录信息  | 通常是将 UserId，UserName 缓存起来                           |
+| 登录信息  | 通常是将 UserId，UserName 缓存起来                                                                                 |
 
 ### 用户登录/登录校验
 
 **登录时序图**
 
-![SSO系统设计-登录时序图](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/security/sso/sso-login-sequence.png-kbrb.png)
+![SSO系统设计-登录时序图](https://oss.javaguide.cn/github/javaguide/system-design/security/sso/sso-login-sequence.png-kbrb.png)
 
 按照上图，用户登录后 AuthToken 保存在 Cookie 中。 domain=test.com
 浏览器会将 domain 设置成 .test.com，
@@ -82,7 +82,7 @@ SSO 英文全称 Single Sign On，单点登录。SSO 是在多个应用系统中
 
 **登录信息获取/登录状态校验**
 
-![SSO系统设计-登录信息获取/登录状态校验](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/security/sso/sso-logincheck-sequence.png-kbrb.png)
+![SSO系统设计-登录信息获取/登录状态校验](https://oss.javaguide.cn/github/javaguide/system-design/security/sso/sso-logincheck-sequence.png-kbrb.png)
 
 ### 用户登出
 
@@ -93,7 +93,7 @@ SSO 英文全称 Single Sign On，单点登录。SSO 是在多个应用系统中
 
 **登出时序图**
 
-![SSO系统设计-用户登出](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/security/sso/sso-logout-sequence.png-kbrb.png)
+![SSO系统设计-用户登出](https://oss.javaguide.cn/github/javaguide/system-design/security/sso/sso-logout-sequence.png-kbrb.png)
 
 ### 跨域登录、登出
 
@@ -106,17 +106,19 @@ SSO 英文全称 Single Sign On，单点登录。SSO 是在多个应用系统中
 
 **跨域登录（主域名已登录）**
 
-![SSO系统设计-跨域登录（主域名已登录）](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/security/sso/sso-crossdomain-login-loggedin-sequence.png-kbrb.png)
+![SSO系统设计-跨域登录（主域名已登录）](https://oss.javaguide.cn/github/javaguide/system-design/security/sso/sso-crossdomain-login-loggedin-sequence.png-kbrb.png)
 
 **跨域登录（主域名未登录）**
 
-![SSO系统设计-跨域登录（主域名未登录）](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/security/sso/sso-crossdomain-login-unlogin-sequence.png-kbrb.png)
+![SSO系统设计-跨域登录（主域名未登录）](https://oss.javaguide.cn/github/javaguide/system-design/security/sso/sso-crossdomain-login-unlogin-sequence.png-kbrb.png)
 
 **跨域登出**
 
-![SSO系统设计-跨域登出](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/security/sso/sso-crossdomain-logout-sequence.png-kbrb.png)
+![SSO系统设计-跨域登出](https://oss.javaguide.cn/github/javaguide/system-design/security/sso/sso-crossdomain-logout-sequence.png-kbrb.png)
 
 ## 说明
 
-- 关于方案 ：这次设计方案更多是提供实现思路。如果涉及到 APP 用户登录等情况，在访问 SSO 服务时，增加对 APP 的签名验证就好了。当然，如果有无线网关，验证签名不是问题。
+- 关于方案：这次设计方案更多是提供实现思路。如果涉及到 APP 用户登录等情况，在访问 SSO 服务时，增加对 APP 的签名验证就好了。当然，如果有无线网关，验证签名不是问题。
 - 关于时序图：时序图中并没有包含所有场景，只列举了核心/主要场景，另外对于一些不影响理解思路的消息能省就省了。
+
+<!-- @include: @article-footer.snippet.md -->

@@ -3,21 +3,21 @@ title: RestFul API 简明教程
 category: 代码质量
 ---
 
-![](https://img-blog.csdnimg.cn/2021050713553862.png)
+![](https://oss.javaguide.cn/system-design/basis/2021050713553862.png)
 
 这篇文章简单聊聊后端程序员必备的 RESTful API 相关的知识。
 
-开始正式介绍 RESTful API 之前，我们需要首先搞清 ：**API 到底是什么？**
+开始正式介绍 RESTful API 之前，我们需要首先搞清：**API 到底是什么？**
 
 ## 何为 API？
 
-![](https://img-blog.csdnimg.cn/20210507153833945.png)
+![](https://oss.javaguide.cn/system-design/basis/20210507153833945.png)
 
 **API（Application Programming Interface）** 翻译过来是应用程序编程接口的意思。
 
 我们在进行后端开发的时候，主要的工作就是为前端或者其他后端服务提供 API 比如查询用户数据的 API 。
 
-![](https://img-blog.csdnimg.cn/20210507130629538.png)
+![](https://oss.javaguide.cn/system-design/basis/20210507130629538.png)
 
 但是， API 不仅仅代表后端系统暴露的接口，像框架中提供的方法也属于 API 的范畴。
 
@@ -25,7 +25,7 @@ category: 代码质量
 
 1. 你通过某电商网站搜索某某商品，电商网站的前端就调用了后端提供了搜索商品相关的 API。
 2. 你使用 JDK 开发 Java 程序，想要读取用户的输入的话，你就需要使用 JDK 提供的 IO 相关的 API。
-3. ......
+3. ……
 
 你可以把 API 理解为程序与程序之间通信的桥梁，其本质就是一个函数而已。另外，API 的使用也不是没有章法的，它的规则由（比如数据输入和输出的格式）API 提供方制定。
 
@@ -37,7 +37,7 @@ category: 代码质量
 
 举个例子，如果我给你下面两个 API 你是不是立马能知道它们是干什么用的！这就是 RESTful API 的强大之处！
 
-```
+```plain
 GET    /classes：列出所有班级
 POST   /classes：新建一个班级
 ```
@@ -54,9 +54,9 @@ POST   /classes：新建一个班级
 
 我们分别对上面涉及到的概念进行解读，以便加深理解，实际上你不需要搞懂下面这些概念，也能看懂我下一部分要介绍到的内容。不过，为了更好地能跟别人扯扯 “RESTful API”我建议你还是要好好理解一下！
 
-- **资源（Resource）** ：我们可以把真实的对象数据称为资源。一个资源既可以是一个集合，也可以是单个个体。比如我们的班级 classes 是代表一个集合形式的资源，而特定的 class 代表单个个体资源。每一种资源都有特定的 URI（统一资源标识符）与之对应，如果我们需要获取这个资源，访问这个 URI 就可以了，比如获取特定的班级：`/class/12`。另外，资源也可以包含子资源，比如 `/classes/classId/teachers`：列出某个指定班级的所有老师的信息
+- **资源（Resource）**：我们可以把真实的对象数据称为资源。一个资源既可以是一个集合，也可以是单个个体。比如我们的班级 classes 是代表一个集合形式的资源，而特定的 class 代表单个个体资源。每一种资源都有特定的 URI（统一资源标识符）与之对应，如果我们需要获取这个资源，访问这个 URI 就可以了，比如获取特定的班级：`/class/12`。另外，资源也可以包含子资源，比如 `/classes/classId/teachers`：列出某个指定班级的所有老师的信息
 - **表现形式（Representational）**："资源"是一种信息实体，它可以有多种外在表现形式。我们把"资源"具体呈现出来的形式比如 `json`，`xml`，`image`,`txt` 等等叫做它的"表现层/表现形式"。
-- **状态转移（State Transfer）** ：大家第一眼看到这个词语一定会很懵逼？内心 BB：这尼玛是啥啊？ 大白话来说 REST 中的状态转移更多地描述的服务器端资源的状态，比如你通过增删改查（通过 HTTP 动词实现）引起资源状态的改变。ps:互联网通信协议 HTTP 协议，是一个无状态协议，所有的资源状态都保存在服务器端。
+- **状态转移（State Transfer）**：大家第一眼看到这个词语一定会很懵逼？内心 BB：这尼玛是啥啊？ 大白话来说 REST 中的状态转移更多地描述的服务器端资源的状态，比如你通过增删改查（通过 HTTP 动词实现）引起资源状态的改变。ps:互联网通信协议 HTTP 协议，是一个无状态协议，所有的资源状态都保存在服务器端。
 
 综合上面的解释，我们总结一下什么是 RESTful 架构：
 
@@ -66,15 +66,15 @@ POST   /classes：新建一个班级
 
 ## RESTful API 规范
 
-![](https://img-blog.csdnimg.cn/20210507154007779.png)
+![](https://oss.javaguide.cn/system-design/basis/20210507154007779.png)
 
 ### 动作
 
 - `GET`：请求从服务器获取特定资源。举个例子：`GET /classes`（获取所有班级）
-- `POST` ：在服务器上创建一个新的资源。举个例子：`POST /classes`（创建班级）
-- `PUT` ：更新服务器上的资源（客户端提供更新后的整个资源）。举个例子：`PUT /classes/12`（更新编号为 12 的班级）
-- `DELETE` ：从服务器删除特定的资源。举个例子：`DELETE /classes/12`（删除编号为 12 的班级）
-- `PATCH` ：更新服务器上的资源（客户端提供更改的属性，可以看做作是部分更新），使用的比较少，这里就不举例子了。
+- `POST`：在服务器上创建一个新的资源。举个例子：`POST /classes`（创建班级）
+- `PUT`：更新服务器上的资源（客户端提供更新后的整个资源）。举个例子：`PUT /classes/12`（更新编号为 12 的班级）
+- `DELETE`：从服务器删除特定的资源。举个例子：`DELETE /classes/12`（删除编号为 12 的班级）
+- `PATCH`：更新服务器上的资源（客户端提供更改的属性，可以看做作是部分更新），使用的比较少，这里就不举例子了。
 
 ### 路径（接口命名）
 
@@ -87,7 +87,7 @@ POST   /classes：新建一个班级
 
 Talk is cheap！来举个实际的例子来说明一下吧！现在有这样一个 API 提供班级（class）的信息，还包括班级中的学生和教师的信息，则它的路径应该设计成下面这样。
 
-```
+```plain
 GET    /classes：列出所有班级
 POST   /classes：新建一个班级
 GET    /classes/{classId}：获取某个指定班级的信息
@@ -101,7 +101,7 @@ DELETE /classes/{classId}/teachers/{ID}：删除某个指定班级下的指定�
 
 反例：
 
-```
+```plain
 /getAllclasses
 /createNewclass
 /deleteAllActiveclasses
@@ -113,13 +113,13 @@ DELETE /classes/{classId}/teachers/{ID}：删除某个指定班级下的指定�
 
 如果我们在查询的时候需要添加特定条件的话，建议使用 url 参数的形式。比如我们要查询 state 状态为 active 并且 name 为 guidegege 的班级：
 
-```
+```plain
 GET    /classes?state=active&name=guidegege
 ```
 
 比如我们要实现分页查询：
 
-```
+```plain
 GET    /classes?page=1&size=10 //指定第1页，每页10个数据
 ```
 
@@ -164,14 +164,16 @@ GET    /classes?page=1&size=10 //指定第1页，每页10个数据
 
 ## 参考
 
-- https://RESTfulapi.net/
+- <https://RESTfulapi.net/>
 
-- https://www.ruanyifeng.com/blog/2014/05/restful_api.html
+- <https://www.ruanyifeng.com/blog/2014/05/restful_api.html>
 
-- https://juejin.im/entry/59e460c951882542f578f2f0
+- <https://juejin.im/entry/59e460c951882542f578f2f0>
 
-- https://phauer.com/2016/testing-RESTful-services-java-best-practices/
+- <https://phauer.com/2016/testing-RESTful-services-java-best-practices/>
 
-- https://www.seobility.net/en/wiki/REST_API
+- <https://www.seobility.net/en/wiki/REST_API>
 
-- https://dev.to/duomly/rest-api-vs-graphql-comparison-3j6g
+- <https://dev.to/duomly/rest-api-vs-graphql-comparison-3j6g>
+
+<!-- @include: @article-footer.snippet.md -->

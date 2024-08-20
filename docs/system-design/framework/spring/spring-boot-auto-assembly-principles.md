@@ -1,5 +1,5 @@
 ---
-title:  SpringBoot 自动装配原理详解
+title: SpringBoot 自动装配原理详解
 category: 框架
 tag:
   - SpringBoot
@@ -81,6 +81,7 @@ public class DemoApplication {
 我们现在提到自动装配的时候，一般会和 Spring Boot 联系在一起。但是，实际上 Spring Framework 早就实现了这个功能。Spring Boot 只是在其基础上，通过 SPI 的方式，做了进一步优化。
 
 > SpringBoot 定义了一套接口规范，这套规范规定：SpringBoot 在启动时会扫描外部引用 jar 包中的`META-INF/spring.factories`文件，将文件中配置的类型信息加载到 Spring 容器（此处涉及到 JVM 类加载机制与 Spring 的容器知识），并执行类中定义的各种操作。对于外部 jar 来说，只需要按照 SpringBoot 定义的标准，就能将自己的功能装置进 SpringBoot。
+> 自 Spring Boot 3.0 开始，自动配置包的路径从`META-INF/spring.factories` 修改为 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`。
 
 没有 Spring Boot 的情况下，如果我们需要引入第三方依赖，需要手动配置，非常麻烦。但是，Spring Boot 中，我们直接引入一个 starter 即可。比如你想要在项目中使用 redis 的话，直接在项目中引入对应的 starter 即可。
 
@@ -123,9 +124,9 @@ public @interface SpringBootConfiguration {
 
 - `@EnableAutoConfiguration`：启用 SpringBoot 的自动配置机制
 - `@Configuration`：允许在上下文中注册额外的 bean 或导入其他配置类
-- `@ComponentScan`： 扫描被`@Component` (`@Service`,`@Controller`)注解的 bean，注解默认会扫描启动类所在的包下所有的类 ，可以自定义不扫描某些 bean。如下图所示，容器中将排除`TypeExcludeFilter`和`AutoConfigurationExcludeFilter`。
+- `@ComponentScan`：扫描被`@Component` (`@Service`,`@Controller`)注解的 bean，注解默认会扫描启动类所在的包下所有的类 ，可以自定义不扫描某些 bean。如下图所示，容器中将排除`TypeExcludeFilter`和`AutoConfigurationExcludeFilter`。
 
-  ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/bcc73490afbe4c6ba62acde6a94ffdfd~tplv-k3u1fbpfcp-watermark.image)
+![](https://oss.javaguide.cn/p3-juejin/bcc73490afbe4c6ba62acde6a94ffdfd~tplv-k3u1fbpfcp-watermark.png)
 
 `@EnableAutoConfiguration` 是实现自动装配的重要注解，我们以这个注解入手。
 
@@ -191,7 +192,7 @@ public String[] selectImports(AnnotationMetadata annotationMetadata) {
 
 该方法调用链如下：
 
-![](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3c1200712655443ca4b38500d615bb70~tplv-k3u1fbpfcp-watermark.image)
+![](https://oss.javaguide.cn/github/javaguide/system-design/framework/spring/3c1200712655443ca4b38500d615bb70~tplv-k3u1fbpfcp-watermark.png)
 
 现在我们结合`getAutoConfigurationEntry()`的源码来详细分析一下：
 
@@ -223,27 +224,27 @@ AutoConfigurationEntry getAutoConfigurationEntry(AutoConfigurationMetadata autoC
 
 判断自动装配开关是否打开。默认`spring.boot.enableautoconfiguration=true`，可在 `application.properties` 或 `application.yml` 中设置
 
-![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/77aa6a3727ea4392870f5cccd09844ab~tplv-k3u1fbpfcp-watermark.image)
+![](https://oss.javaguide.cn/p3-juejin/77aa6a3727ea4392870f5cccd09844ab~tplv-k3u1fbpfcp-watermark.png)
 
-**第 2 步** ：
+**第 2 步**：
 
 用于获取`EnableAutoConfiguration`注解中的 `exclude` 和 `excludeName`。
 
-![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3d6ec93bbda1453aa08c52b49516c05a~tplv-k3u1fbpfcp-zoom-1.image)
+![](https://oss.javaguide.cn/p3-juejin/3d6ec93bbda1453aa08c52b49516c05a~tplv-k3u1fbpfcp-zoom-1.png)
 
 **第 3 步**
 
 获取需要自动装配的所有配置类，读取`META-INF/spring.factories`
 
-```
+```plain
 spring-boot/spring-boot-project/spring-boot-autoconfigure/src/main/resources/META-INF/spring.factories
 ```
 
-![](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/58c51920efea4757aa1ec29c6d5f9e36~tplv-k3u1fbpfcp-watermark.image)
+![](https://oss.javaguide.cn/github/javaguide/system-design/framework/spring/58c51920efea4757aa1ec29c6d5f9e36~tplv-k3u1fbpfcp-watermark.png)
 
 从下图可以看到这个文件的配置内容都被我们读取到了。`XXXAutoConfiguration`的作用就是按需加载组件。
 
-![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/94d6e1a060ac41db97043e1758789026~tplv-k3u1fbpfcp-watermark.image)
+![](https://oss.javaguide.cn/github/javaguide/system-design/framework/spring/94d6e1a060ac41db97043e1758789026~tplv-k3u1fbpfcp-watermark.png)
 
 不光是这个依赖下的`META-INF/spring.factories`被读取到，所有 Spring Boot Starter 下的`META-INF/spring.factories`都会被读取到。
 
@@ -251,15 +252,15 @@ spring-boot/spring-boot-project/spring-boot-autoconfigure/src/main/resources/MET
 
 如果，我们自己要创建一个 Spring Boot Starter，这一步是必不可少的。
 
-![](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/68fa66aeee474b0385f94d23bcfe1745~tplv-k3u1fbpfcp-watermark.image)
+![](https://oss.javaguide.cn/github/javaguide/system-design/framework/spring/68fa66aeee474b0385f94d23bcfe1745~tplv-k3u1fbpfcp-watermark.png)
 
-**第 4 步** ：
+**第 4 步**：
 
 到这里可能面试官会问你:“`spring.factories`中这么多配置，每次启动都要全部加载么？”。
 
 很明显，这是不现实的。我们 debug 到后面你会发现，`configurations` 的值变小了。
 
-![](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/267f8231ae2e48d982154140af6437b0~tplv-k3u1fbpfcp-watermark.image)
+![](https://oss.javaguide.cn/github/javaguide/system-design/framework/spring/267f8231ae2e48d982154140af6437b0~tplv-k3u1fbpfcp-watermark.png)
 
 因为，这一步有经历了一遍筛选，`@ConditionalOnXXX` 中的所有条件都满足，该类才会生效。
 
@@ -295,28 +296,30 @@ public class RabbitAutoConfiguration {
 
 第一步，创建`threadpool-spring-boot-starter`工程
 
-![](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1ff0ebe7844f40289eb60213af72c5a6~tplv-k3u1fbpfcp-watermark.image)
+![](https://oss.javaguide.cn/github/javaguide/system-design/framework/spring/1ff0ebe7844f40289eb60213af72c5a6~tplv-k3u1fbpfcp-watermark.png)
 
 第二步，引入 Spring Boot 相关依赖
 
-![](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5e14254276604f87b261e5a80a354cc0~tplv-k3u1fbpfcp-watermark.image)
+![](https://oss.javaguide.cn/github/javaguide/system-design/framework/spring/5e14254276604f87b261e5a80a354cc0~tplv-k3u1fbpfcp-watermark.png)
 
 第三步，创建`ThreadPoolAutoConfiguration`
 
-![](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1843f1d12c5649fba85fd7b4e4a59e39~tplv-k3u1fbpfcp-watermark.image)
+![](https://oss.javaguide.cn/github/javaguide/system-design/framework/spring/1843f1d12c5649fba85fd7b4e4a59e39~tplv-k3u1fbpfcp-watermark.png)
 
 第四步，在`threadpool-spring-boot-starter`工程的 resources 包下创建`META-INF/spring.factories`文件
 
-![](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/97b738321f1542ea8140484d6aaf0728~tplv-k3u1fbpfcp-watermark.image)
+![](https://oss.javaguide.cn/github/javaguide/system-design/framework/spring/97b738321f1542ea8140484d6aaf0728~tplv-k3u1fbpfcp-watermark.png)
 
 最后新建工程引入`threadpool-spring-boot-starter`
 
-![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/edcdd8595a024aba85b6bb20d0e3fed4~tplv-k3u1fbpfcp-watermark.image)
+![](https://oss.javaguide.cn/github/javaguide/system-design/framework/spring/edcdd8595a024aba85b6bb20d0e3fed4~tplv-k3u1fbpfcp-watermark.png)
 
 测试通过！！！
 
-![](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9a265eea4de742a6bbdbbaa75f437307~tplv-k3u1fbpfcp-watermark.image)
+![](https://oss.javaguide.cn/github/javaguide/system-design/framework/spring/9a265eea4de742a6bbdbbaa75f437307~tplv-k3u1fbpfcp-watermark.png)
 
 ## 总结
 
 Spring Boot 通过`@EnableAutoConfiguration`开启自动装配，通过 SpringFactoriesLoader 最终加载`META-INF/spring.factories`中的自动配置类实现自动装配，自动配置类其实就是通过`@Conditional`按需加载的配置类，想要其生效必须引入`spring-boot-starter-xxx`包实现起步依赖
+
+<!-- @include: @article-footer.snippet.md -->

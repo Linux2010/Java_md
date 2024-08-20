@@ -1,5 +1,5 @@
 ---
-title:  Java 代理模式详解
+title: Java 代理模式详解
 category: Java
 tag:
   - Java基础
@@ -13,7 +13,7 @@ tag:
 
 举个例子：新娘找来了自己的姨妈来代替自己处理新郎的提问，新娘收到的提问都是经过姨妈处理过滤之后的。姨妈在这里就可以看作是代理你的代理对象，代理的行为（方法）是接收和回复新郎的提问。
 
-![Understanding the Proxy Design Pattern | by Mithun Sasidharan | Medium](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/2020-8/1*DjWCgTFm-xqbhbNQVsaWQw.png)
+![Understanding the Proxy Design Pattern | by Mithun Sasidharan | Medium](https://oss.javaguide.cn/2020-8/1*DjWCgTFm-xqbhbNQVsaWQw.png)
 
 <p style="text-align:right;font-size:13px;color:gray">https://medium.com/@mithunsasidharan/understanding-the-proxy-design-pattern-5e63fe38052a</p>
 
@@ -208,7 +208,7 @@ public class DebugInvocationHandler implements InvocationHandler {
         this.target = target;
     }
 
-
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws InvocationTargetException, IllegalAccessException {
         //调用方法之前，我们可以添加自己的操作
         System.out.println("before method " + method.getName());
@@ -229,7 +229,7 @@ public class DebugInvocationHandler implements InvocationHandler {
 public class JdkProxyFactory {
     public static Object getProxy(Object target) {
         return Proxy.newProxyInstance(
-                target.getClass().getClassLoader(), // 目标类的类加载
+                target.getClass().getClassLoader(), // 目标类的类加载器
                 target.getClass().getInterfaces(),  // 代理需要实现的接口，可指定多个
                 new DebugInvocationHandler(target)   // 代理对象对应的自定义 InvocationHandler
         );
@@ -237,7 +237,7 @@ public class JdkProxyFactory {
 }
 ```
 
-`getProxy()` ：主要通过`Proxy.newProxyInstance（）`方法获取某个类的代理对象
+`getProxy()`：主要通过`Proxy.newProxyInstance（）`方法获取某个类的代理对象
 
 **5.实际使用**
 
@@ -248,7 +248,7 @@ smsService.send("java");
 
 运行上述代码之后，控制台打印出：
 
-```
+```plain
 before method send
 send message:java
 after method send
@@ -392,8 +392,8 @@ after method send
 
 ## 4. 静态代理和动态代理的对比
 
-1. **灵活性** ：动态代理更加灵活，不需要必须实现接口，可以直接代理实现类，并且可以不需要针对每个目标类都创建一个代理类。另外，静态代理中，接口一旦新增加方法，目标对象和代理对象都要进行修改，这是非常麻烦的！
-2. **JVM 层面** ：静态代理在编译时就将接口、实现类、代理类这些都变成了一个个实际的 class 文件。而动态代理是在运行时动态生成类字节码，并加载到 JVM 中的。
+1. **灵活性**：动态代理更加灵活，不需要必须实现接口，可以直接代理实现类，并且可以不需要针对每个目标类都创建一个代理类。另外，静态代理中，接口一旦新增加方法，目标对象和代理对象都要进行修改，这是非常麻烦的！
+2. **JVM 层面**：静态代理在编译时就将接口、实现类、代理类这些都变成了一个个实际的 class 文件。而动态代理是在运行时动态生成类字节码，并加载到 JVM 中的。
 
 ## 5. 总结
 
@@ -401,3 +401,4 @@ after method send
 
 文中涉及到的所有源码，你可以在这里找到：[https://github.com/Snailclimb/guide-rpc-framework-learning/tree/master/src/main/java/github/javaguide/proxy](https://github.com/Snailclimb/guide-rpc-framework-learning/tree/master/src/main/java/github/javaguide/proxy) 。
 
+<!-- @include: @article-footer.snippet.md -->

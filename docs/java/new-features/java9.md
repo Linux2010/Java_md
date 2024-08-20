@@ -5,11 +5,11 @@ tag:
   - Java新特性
 ---
 
-**Java 9** 发布于 2017 年 9 月 21 日 。作为 Java 8 之后 3 年半才发布的新版本，Java 9 带来了很多重大的变化其中最重要的改动是 Java 平台模块系统的引入，其他还有诸如集合、`Stream` 流......。
+**Java 9** 发布于 2017 年 9 月 21 日 。作为 Java 8 之后 3 年半才发布的新版本，Java 9 带来了很多重大的变化其中最重要的改动是 Java 平台模块系统的引入，其他还有诸如集合、`Stream` 流……。
 
-你可以在 [Archived OpenJDK General-Availability Releases](http://jdk.java.net/archive/) 上下载自己需要的 JDK 版本！官方的新特性说明文档地址： https://openjdk.java.net/projects/jdk/ 。
+你可以在 [Archived OpenJDK General-Availability Releases](http://jdk.java.net/archive/) 上下载自己需要的 JDK 版本！官方的新特性说明文档地址：<https://openjdk.java.net/projects/jdk/> 。
 
-**概览（精选了一部分）** ：
+**概览（精选了一部分）**：
 
 - [JEP 222: Java 命令行工具](https://openjdk.java.net/jeps/222)
 - [JEP 261: 模块化系统](https://openjdk.java.net/jeps/261)
@@ -23,20 +23,20 @@ JShell 是 Java 9 新增的一个实用工具。为 Java 提供了类似于 Pyth
 
 在 JShell 中可以直接输入表达式并查看其执行结果。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/java-guide-blog/image-20210816083417616.png)
+![](https://oss.javaguide.cn/java-guide-blog/image-20210816083417616.png)
 
 **JShell 为我们带来了哪些好处呢？**
 
 1. 降低了输出第一行 Java 版"Hello World！"的门槛，能够提高新手的学习热情。
 2. 在处理简单的小逻辑，验证简单的小问题时，比 IDE 更有效率（并不是为了取代 IDE，对于复杂逻辑的验证，IDE 更合适，两者互补）。
-3. ......
+3. ……
 
 **JShell 的代码和普通的可编译代码，有什么不一样？**
 
 1. 一旦语句输入完成，JShell 立即就能返回执行的结果，而不再需要编辑器、编译器、解释器。
 2. JShell 支持变量的重复声明，后面声明的会覆盖前面声明的。
 3. JShell 支持独立的表达式比如普通的加法运算 `1 + 1`。
-4. ......
+4. ……
 
 ## 模块化系统
 
@@ -50,7 +50,7 @@ JShell 是 Java 9 新增的一个实用工具。为 Java 提供了类似于 Pyth
 
 任意一个 jar 文件，只要加上一个模块描述文件（`module-info.java`），就可以升级为一个模块。
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/java-guide-blog/module-structure.png)
+![](https://oss.javaguide.cn/java-guide-blog/module-structure.png)
 
 在引入了模块系统之后，JDK 被重新组织成 94 个模块。Java 应用可以通过新增的 **[jlink](http://openjdk.java.net/jeps/282) 工具** (Jlink 是随 Java 9 一起发布的新命令行工具。它允许开发人员为基于模块的 Java 应用程序创建自己的轻量级、定制的 JRE)，创建出只包含所依赖的 JDK 模块的自定义运行时镜像。这样可以极大的减少 Java 运行时环境的大小。
 
@@ -64,7 +64,7 @@ module my.module {
 
 module my.module {
      //exports…to 限制访问的成员范围
-    export com.·my.package.name to com.specific.package;
+    export com.my.package.name to com.specific.package;
 }
 ```
 
@@ -72,14 +72,13 @@ module my.module {
 
 - [《Project Jigsaw: Module System Quick-Start Guide》](https://openjdk.java.net/projects/jigsaw/quick-start)
 - [《Java 9 Modules: part 1》](https://stacktraceguru.com/java9/module-introduction)
-- [[Java 9 揭秘（2. 模块化系统）](https://www.cnblogs.com/IcanFixIt/p/6947763.html)](http://www.cnblogs.com/IcanFixIt/p/6947763.html)
+- [Java 9 揭秘（2. 模块化系统）](http://www.cnblogs.com/IcanFixIt/p/6947763.html)
 
 ## G1 成为默认垃圾回收器
 
-在 Java 8 的时候，默认垃圾回收器是 Parallel Scavenge（新生代）+Parallel Old（老年代）。到了 Java 9, CMS 垃圾回收器被废弃了，**G1（Garbage-First Garbage Collector）**  成为了默认垃圾回收器。
+在 Java 8 的时候，默认垃圾回收器是 Parallel Scavenge（新生代）+Parallel Old（老年代）。到了 Java 9, CMS 垃圾回收器被废弃了，**G1（Garbage-First Garbage Collector）** 成为了默认垃圾回收器。
 
 G1 还是在 Java 7 中被引入的，经过两个版本优异的表现成为成为默认垃圾回收器。
-
 
 ## 快速创建不可变集合
 
@@ -139,7 +138,7 @@ try (scanner;writer) {
 
 **什么是 effectively-final 变量？** 简单来说就是没有被 `final` 修饰但是值在初始化后从未更改的变量。
 
-正如上面的代码所演示的那样，即使 `writer` 变量没有被显示声明为 `final`，但它在第一次被复制后就不会改变了，因此，它就是 effectively-final 变量。
+正如上面的代码所演示的那样，即使 `writer` 变量没有被显示声明为 `final`，但它在第一次被赋值后就不会改变了，因此，它就是 effectively-final 变量。
 
 ## Stream & Optional 增强
 
@@ -223,7 +222,7 @@ System.out.println(currentProcess.info());
 
 `ProcessHandle` 接口概览：
 
-![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/java-guide-blog/image-20210816104614414.png)
+![](https://oss.javaguide.cn/java-guide-blog/image-20210816104614414.png)
 
 ## 响应式流 （ Reactive Streams ）
 
@@ -231,7 +230,7 @@ System.out.println(currentProcess.info());
 
 `Flow` 中包含了 `Flow.Publisher`、`Flow.Subscriber`、`Flow.Subscription` 和 `Flow.Processor` 等 4 个核心接口。Java 9 还提供了`SubmissionPublisher` 作为`Flow.Publisher` 的一个实现。
 
-关于 Java 9 响应式流更详细的解读，推荐你看 [Java 9 揭秘（17. Reactive Streams ）- 林本托 ](https://www.cnblogs.com/IcanFixIt/p/7245377.html) 这篇文章。
+关于 Java 9 响应式流更详细的解读，推荐你看 [Java 9 揭秘（17. Reactive Streams ）- 林本托](https://www.cnblogs.com/IcanFixIt/p/7245377.html) 这篇文章。
 
 ## 变量句柄
 
@@ -243,18 +242,20 @@ System.out.println(currentProcess.info());
 
 ## 其它
 
-- **平台日志 API 改进** ： Java 9 允许为 JDK 和应用配置同样的日志实现。新增了 `System.LoggerFinder` 用来管理 JDK 使 用的日志记录器实现。JVM 在运行时只有一个系统范围的 `LoggerFinder` 实例。我们可以通过添加自己的 `System.LoggerFinder` 实现来让 JDK 和应用使用 SLF4J 等其他日志记录框架。
-- **`CompletableFuture`类增强** ：新增了几个新的方法（`completeAsync` ，`orTimeout` 等）。
-- **Nashorn 引擎的增强** ：Nashorn 从 Java8 开始引入的 JavaScript 引擎，Java9 对 Nashorn 做了些增强，实现了一些 ES6 的新特性（Java 11 中已经被弃用）。
-- **I/O 流的新特性** ：增加了新的方法来读取和复制 `InputStream` 中包含的数据。
-- **改进应用的安全性能** ：Java 9 新增了 4 个 SHA- 3 哈希算法，SHA3-224、SHA3-256、SHA3-384 和 SHA3-512。
-- **改进方法句柄（Method Handle）** ：方法句柄从 Java7 开始引入，Java9 在类`java.lang.invoke.MethodHandles` 中新增了更多的静态方法来创建不同类型的方法句柄。
-- ......
+- **平台日志 API 改进**：Java 9 允许为 JDK 和应用配置同样的日志实现。新增了 `System.LoggerFinder` 用来管理 JDK 使 用的日志记录器实现。JVM 在运行时只有一个系统范围的 `LoggerFinder` 实例。我们可以通过添加自己的 `System.LoggerFinder` 实现来让 JDK 和应用使用 SLF4J 等其他日志记录框架。
+- **`CompletableFuture`类增强**：新增了几个新的方法（`completeAsync` ，`orTimeout` 等）。
+- **Nashorn 引擎的增强**：Nashorn 是从 Java8 开始引入的 JavaScript 引擎，Java9 对 Nashorn 做了些增强，实现了一些 ES6 的新特性（Java 11 中已经被弃用）。
+- **I/O 流的新特性**：增加了新的方法来读取和复制 `InputStream` 中包含的数据。
+- **改进应用的安全性能**：Java 9 新增了 4 个 SHA- 3 哈希算法，SHA3-224、SHA3-256、SHA3-384 和 SHA3-512。
+- **改进方法句柄（Method Handle）**：方法句柄从 Java7 开始引入，Java9 在类`java.lang.invoke.MethodHandles` 中新增了更多的静态方法来创建不同类型的方法句柄。
+- ……
 
 ## 参考
 
-- Java version history：https://en.wikipedia.org/wiki/Java_version_history
-- Release Notes for JDK 9 and JDK 9 Update Releases : https://www.oracle.com/java/technologies/javase/9-all-relnotes.html
+- Java version history：<https://en.wikipedia.org/wiki/Java_version_history>
+- Release Notes for JDK 9 and JDK 9 Update Releases : <https://www.oracle.com/java/technologies/javase/9-all-relnotes.html>
 - 《深入剖析 Java 新特性》-极客时间 - JShell：怎么快速验证简单的小问题？
-- New Features in Java 9:https://www.baeldung.com/new-java-9
-- Java – Try with Resources：https://www.baeldung.com/java-try-with-resources
+- New Features in Java 9: <https://www.baeldung.com/new-java-9>
+- Java – Try with Resources：<https://www.baeldung.com/java-try-with-resources>
+
+<!-- @include: @article-footer.snippet.md -->
